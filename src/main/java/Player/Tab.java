@@ -21,8 +21,8 @@ public class Tab extends JPanel {
     public Tab(Player player) {
         this.player = player;
         setLayout(null);
-        setPreferredSize(new Dimension((int) (screenSize.getWidth()) ,(int) screenSize.getHeight()));
-        
+        setPreferredSize(new Dimension((int) (screenSize.getWidth()), (int) screenSize.getHeight()));
+
         greenNote.setBounds(xpos, ypos, 50, 50);
         redNote.setBounds(xpos + 75, ypos, 50, 50);
         yellowNote.setBounds(xpos + 150, ypos, 50, 50);
@@ -36,7 +36,7 @@ public class Tab extends JPanel {
         add(orangeNote);
         KB();
         setFocusable(true);
-        NoteGenerator ng = new NoteGenerator("Prueba");
+        NoteGenerator ng = new NoteGenerator("Note Generator");
         notes = ng.getNotes();
     }
 
@@ -44,8 +44,8 @@ public class Tab extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         drawLines(g, xpos, ypos);
-        
-        if(!notes.isEmpty()){
+        g.fillRect(0,0,screenSize.width,screenSize.height);
+        if (!notes.isEmpty()) {
             paintNotes();
         }
     }
@@ -53,28 +53,28 @@ public class Tab extends JPanel {
     private void drawLines(Graphics g, int xpos, int ypos) {
         g.setColor(Color.BLACK);
         g.drawLine(xpos - 25, 0, xpos - 25, ypos + 75);
-        g.drawLine(xpos +25, 0, xpos+25, ypos);
-        g.drawLine(xpos +100, 0, xpos + 100, ypos);
-        g.drawLine(xpos +175, 0, xpos + 175, ypos);
-        g.drawLine(xpos +250, 0, xpos+ 250, ypos);
-        g.drawLine(xpos +325, 0, xpos + 325, ypos);
+        g.drawLine(xpos + 25, 0, xpos + 25, ypos);
+        g.drawLine(xpos + 100, 0, xpos + 100, ypos);
+        g.drawLine(xpos + 175, 0, xpos + 175, ypos);
+        g.drawLine(xpos + 250, 0, xpos + 250, ypos);
+        g.drawLine(xpos + 325, 0, xpos + 325, ypos);
         g.drawLine(xpos + 375, 0, xpos + 375, ypos + 75);
 
         g.setColor(new Color(128, 128, 128, 128));
         g.fillRect(xpos - 25, 0, 400, ypos + 75);
-        
+
     }
 
     public void paintNotes() {
         ArrayList<GameNote> toRemove = new ArrayList<>();
-        for(GameNote element : notes) {
+        for (GameNote element : notes) {
             element.setBounds(element.getX(), element.getY(), 50, 50);
-            if(!element.isAdded()){
+            if (!element.isAdded()) {
                 add(element);
                 element.setAdded(true);
             }
             element.physics();
-            if(element.getY() == screenSize.getHeight()){
+            if (element.getY() == screenSize.getHeight()) {
                 remove(element);
                 toRemove.add(element);
             }
@@ -94,10 +94,10 @@ public class Tab extends JPanel {
     }
 
 
-    public void draw()throws Exception{
+    public void draw() throws Exception {
         SwingUtilities.invokeAndWait(this::repaint);
-    }   
-    
+    }
+
     private void KB() {
         KeyListener kb = new KeyListener() {
             @Override
@@ -148,14 +148,15 @@ public class Tab extends JPanel {
         };
         this.addKeyListener(kb);
     }
-    
+
+
     public void play() throws Exception {
-        while(true) {
+        while (true) {
             draw();
             try {
-                Thread.sleep(1);
-            }catch(InterruptedException e){
-            System.out.println("Error: " + e.getMessage());
+                Thread.sleep(2);
+            } catch (InterruptedException e) {
+                System.out.println("Error: " + e.getMessage());
             }
         }
     }

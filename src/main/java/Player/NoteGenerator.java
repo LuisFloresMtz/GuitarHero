@@ -56,4 +56,5 @@ public class NoteGenerator extends Thread{
             }
         }
     }
+
 }
