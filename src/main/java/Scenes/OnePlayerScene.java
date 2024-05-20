@@ -11,6 +11,7 @@ public class OnePlayerScene extends JFrame {
     public OnePlayerScene() {
         setSize(new Dimension((int) screenSize.getWidth(), (int) screenSize.getHeight()));
         getContentPane().add(player1.tab);
+        setResizable(false);
 
     }
 
