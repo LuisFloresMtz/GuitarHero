@@ -22,7 +22,9 @@ public class Main {
                 game.setResizable(false);
                 game.pack();
                 player1.tab.play();
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
         
        /* Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         JFrame game = new JFrame("Game");

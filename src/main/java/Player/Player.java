@@ -6,6 +6,7 @@ public class Player {
     int noteStreak;
     int multiplier;
     int powerPorcentage;
+    int score;
 
 
     public Player() {
@@ -14,6 +15,7 @@ public class Player {
         this.noteStreak = 0;
         this.multiplier = 1;
         this.powerPorcentage = 0;
+        this.score = 0;
     }
 
     public void resetNoteStreak() {

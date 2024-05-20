@@ -1,16 +1,24 @@
 package Player;
 
+import Connection.mysqlConnection;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Tab extends JPanel {
 
+    mysqlConnection connection;
     Player player;
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     int ypos = (int) screenSize.getHeight() - 100;
     int xpos = (int) (screenSize.getWidth() - 300) / 2;
+    private final JLabel noteStreak = new JLabel("Note Streak: 0");
+    private final JLabel multiplier = new JLabel("Multiplier: 1x");
+    private final JLabel score = new JLabel("Score: 0");
+    private final JLabel life = new JLabel("Life: 50");
     PlayerNote greenNote = new PlayerNote(new Color(54, 58, 59), new Color(8, 200, 3), new Color(8, 200, 3));
     PlayerNote redNote = new PlayerNote(new Color(54, 58, 59), new Color(163, 24, 24), new Color(163, 24, 24));
     PlayerNote yellowNote = new PlayerNote(new Color(54, 58, 59), new Color(254, 254, 53), new Color(254, 254, 53));
@@ -19,16 +27,24 @@ public class Tab extends JPanel {
     ArrayList<GameNote> notes;
 
     public Tab(Player player) {
+        //connection = new mysqlConnection();
         this.player = player;
         setLayout(null);
         setPreferredSize(new Dimension((int) (screenSize.getWidth()), (int) screenSize.getHeight()));
-
+        noteStreak.setBounds(screenSize.width-145, 15, 100, 15);
+        multiplier.setBounds(screenSize.width-145, 30, 100, 15);
+        score.setBounds(screenSize.width-145, 45, 100, 15);
+        life.setBounds(screenSize.width-145, 60, 100, 15);
         greenNote.setBounds(xpos, ypos, 50, 50);
         redNote.setBounds(xpos + 75, ypos, 50, 50);
         yellowNote.setBounds(xpos + 150, ypos, 50, 50);
         blueNote.setBounds(xpos + 225, ypos, 50, 50);
         orangeNote.setBounds(xpos + 300, ypos, 50, 50);
 
+        add(noteStreak);
+        add(multiplier);
+        add(score);
+        add(life);
         add(greenNote);
         add(redNote);
         add(yellowNote);
@@ -42,12 +58,19 @@ public class Tab extends JPanel {
 
     @Override
     protected void paintComponent(Graphics g) {
+        int oldNoteStreak = player.noteStreak;
         super.paintComponent(g);
         drawLines(g, xpos, ypos);
-        g.fillRect(0,0,screenSize.width,screenSize.height);
+        g.fillRect(0, 0, screenSize.width, screenSize.height);
         if (!notes.isEmpty()) {
             paintNotes();
         }
+        if (oldNoteStreak != player.noteStreak){
+            noteStreak.setText("Note Streak: " + player.noteStreak);
+        }
+        score.setText("Score: " + player.score);
+        multiplier.setText("Multiplier: " + player.multiplier + "x");
+        life.setText("Life: " + player.life);
     }
 
     private void drawLines(Graphics g, int xpos, int ypos) {
@@ -66,32 +89,44 @@ public class Tab extends JPanel {
     }
 
     public void paintNotes() {
-        ArrayList<GameNote> toRemove = new ArrayList<>();
-        for (GameNote element : notes) {
+        Iterator<GameNote> iterator = notes.iterator();
+        while (iterator.hasNext()) {
+            GameNote element = iterator.next();
             element.setBounds(element.getX(), element.getY(), 50, 50);
             if (!element.isAdded()) {
                 add(element);
                 element.setAdded(true);
             }
             element.physics();
-            if (element.getY() == screenSize.getHeight()) {
-                remove(element);
-                toRemove.add(element);
+            if (element.getY() >= ypos && element.getY() <= ypos + 50) {
+                if ((element.getColor().equals(greenNote.getColor()) && greenNote.isReleased()) ||
+                        (element.getColor().equals(redNote.getColor()) && redNote.isReleased()) ||
+                        (element.getColor().equals(yellowNote.getColor()) && yellowNote.isReleased()) ||
+                        (element.getColor().equals(blueNote.getColor()) && blueNote.isReleased()) ||
+                        (element.getColor().equals(orangeNote.getColor()) && orangeNote.isReleased())) {
+                    iterator.remove();
+                    player.score += 50 * player.multiplier;
+                    player.noteStreak++;
+                    if (player.noteStreak % 10 == 0 && player.multiplier <= 4) {
+                        player.multiplier++;
+                    }
+                    if (player.life < 100) {
+                        player.life += 5;
+                    }
+                }
+            } else if (element.getY() > screenSize.height + 50) {
+                iterator.remove();
+                player.resetNoteStreak();
+                player.resetMultiplier();
+                if (player.life == 0) {
+                    System.exit(0);
+                } else {
+                    player.life -= 5;
+                }
             }
         }
-        if (!toRemove.isEmpty()){
-            notes.removeAll(toRemove);
-            player.resetNoteStreak();
-            player.resetMultiplier();
-             if (player.life==0){
-                System.exit(0);
-            }else{
-                 player.life -= 5;
-             }
-
-        }
-
     }
+
 
 
     public void draw() throws Exception {
