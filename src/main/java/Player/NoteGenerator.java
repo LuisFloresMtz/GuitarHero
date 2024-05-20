@@ -54,16 +54,6 @@ public class NoteGenerator extends Thread{
                         break;
                 }
             }
-            eliminarNotas();
-        }
-    }
-    public void eliminarNotas(){
-        synchronized (notes){
-            for(int i = 0; i < notes.size(); i++){
-                if(notes.get(i).getY() > screenSize.getHeight() + 50){
-                    notes.remove(i);
-                }
-            }
         }
     }
 }

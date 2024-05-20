@@ -9,11 +9,20 @@ public class Player {
 
 
     public Player() {
-        this.tab = new Tab();
+        this.tab = new Tab(this);
         this.life = 50;
         this.noteStreak = 0;
         this.multiplier = 1;
         this.powerPorcentage = 0;
     }
+
+    public void resetNoteStreak() {
+        this.noteStreak = 0;
+    }
+    public void resetMultiplier() {
+        this.multiplier = 1;
+    }
+
+
 
 }

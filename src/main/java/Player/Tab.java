@@ -6,6 +6,8 @@ import java.awt.event.*;
 import java.util.ArrayList;
 
 public class Tab extends JPanel {
+
+    Player player;
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     int ypos = (int) screenSize.getHeight() - 100;
     int xpos = (int) (screenSize.getWidth() - 300) / 2;
@@ -16,7 +18,8 @@ public class Tab extends JPanel {
     PlayerNote orangeNote = new PlayerNote(new Color(54, 58, 59), new Color(217, 147, 53), new Color(217, 147, 53));
     ArrayList<GameNote> notes;
 
-    public Tab() {
+    public Tab(Player player) {
+        this.player = player;
         setLayout(null);
         setPreferredSize(new Dimension((int) (screenSize.getWidth()) ,(int) screenSize.getHeight()));
         
@@ -76,7 +79,18 @@ public class Tab extends JPanel {
                 toRemove.add(element);
             }
         }
-        notes.removeAll(toRemove);
+        if (!toRemove.isEmpty()){
+            notes.removeAll(toRemove);
+            player.resetNoteStreak();
+            player.resetMultiplier();
+             if (player.life==0){
+                System.exit(0);
+            }else{
+                 player.life -= 5;
+             }
+
+        }
+
     }
 
 
