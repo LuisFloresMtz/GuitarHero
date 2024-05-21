@@ -1,6 +1,7 @@
 package Player;
 
 import Connection.mysqlConnection;
+import Player.GameNote;
 
 import javax.swing.*;
 import java.awt.*;
@@ -25,6 +26,7 @@ public class Tab extends JPanel {
     PlayerNote blueNote = new PlayerNote(new Color(54, 58, 59), new Color(63, 162, 211), new Color(63, 162, 211));
     PlayerNote orangeNote = new PlayerNote(new Color(54, 58, 59), new Color(217, 147, 53), new Color(217, 147, 53));
     ArrayList<GameNote> notes;
+    NoteGenerator ng;
 
     public Tab(Player player) {
         //connection = new mysqlConnection();
@@ -52,7 +54,7 @@ public class Tab extends JPanel {
         add(orangeNote);
         KB();
         setFocusable(true);
-        NoteGenerator ng = new NoteGenerator("Note Generator");
+        ng = new NoteGenerator("Note Generator");
         notes = ng.getNotes();
     }
 
@@ -97,31 +99,38 @@ public class Tab extends JPanel {
                 add(element);
                 element.setAdded(true);
             }
-            element.physics();
-            if (element.getY() >= ypos && element.getY() <= ypos + 50) {
-                if ((element.getColor().equals(greenNote.getColor()) && greenNote.isReleased()) ||
-                        (element.getColor().equals(redNote.getColor()) && redNote.isReleased()) ||
-                        (element.getColor().equals(yellowNote.getColor()) && yellowNote.isReleased()) ||
-                        (element.getColor().equals(blueNote.getColor()) && blueNote.isReleased()) ||
-                        (element.getColor().equals(orangeNote.getColor()) && orangeNote.isReleased())) {
-                    iterator.remove();
-                    player.score += 50 * player.multiplier;
-                    player.noteStreak++;
-                    if (player.noteStreak % 10 == 0 && player.multiplier <= 4) {
-                        player.multiplier++;
-                    }
-                    if (player.life < 100) {
-                        player.life += 5;
+            element.physics();   
+            synchronized (ng){
+                if (element.getY() >= ypos && element.getY() <= ypos + 50) {
+                    if ((element.getColor().equals(greenNote.getColor()) && greenNote.isReleased() && element.getX() == xpos) ||
+                            (element.getColor().equals(redNote.getColor()) && redNote.isReleased() && element.getX() == xpos + 75) ||
+                            (element.getColor().equals(yellowNote.getColor()) && yellowNote.isReleased() && element.getX() == xpos + 150) ||
+                            (element.getColor().equals(blueNote.getColor()) && blueNote.isReleased() && element.getX() == xpos + 225) ||
+                            (element.getColor().equals(orangeNote.getColor()) && orangeNote.isReleased() && element.getX() == xpos + 300)) {
+                        iterator.remove();
+                        remove(element);
+                        notes.remove(element);
+                        player.score += 50 * player.multiplier;
+                        player.noteStreak++;
+                        if (player.noteStreak % 10 == 0 && player.multiplier <= 4) {
+                            player.multiplier++;
+                        }
+                        if (player.life < 100) {
+                            player.life += 5;
+                        }
                     }
                 }
-            } else if (element.getY() > screenSize.height + 50) {
-                iterator.remove();
-                player.resetNoteStreak();
-                player.resetMultiplier();
-                if (player.life == 0) {
-                    System.exit(0);
-                } else {
-                    player.life -= 5;
+                else if (element.getY() == screenSize.height /*> screenSize.height + 50*/) {
+                    iterator.remove();
+                    remove(element);
+                    notes.remove(element);
+                    player.resetNoteStreak();
+                    player.resetMultiplier();
+                    if (player.life == 0) {
+                        System.exit(0);
+                    } else {
+                        player.life -= 5;
+                    }
                 }
             }
         }
