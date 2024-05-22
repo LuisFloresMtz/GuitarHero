@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class mysqlConnection {
-    String url =  "jdbc:mysql://localhost:3306/guitar_hero";
+    String url =  "jdbc:mysql://localhost:3306/consultorios";
 
     public mysqlConnection(){
         try{

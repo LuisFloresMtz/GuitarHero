@@ -23,8 +23,8 @@ public class GameNote extends Note {
     }
 
     
-    public GameNote(int x, int y, Color color, Color borderColor) {
-        super(color, borderColor);
+    public GameNote(int x, int y, Color color) {
+        super(color, color);
         this.x = x;
         this.y = y;
         this.added = false;

@@ -17,6 +17,14 @@ public class Player {
         this.powerPorcentage = 0;
         this.score = 0;
     }
+    public Player(int playerNumber) {
+        this.tab = new Tab(this, playerNumber);
+        this.life = 50;
+        this.noteStreak = 0;
+        this.multiplier = 1;
+        this.powerPorcentage = 0;
+        this.score = 0;
+    }
 
     public void resetNoteStreak() {
         this.noteStreak = 0;

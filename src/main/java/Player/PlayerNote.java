@@ -2,12 +2,12 @@ package Player;
 
 import java.awt.*;
 
-public class PlayerNote extends Note{
+public class PlayerNote extends Note {
     private boolean released;
     private Color colorClick;
 
-    PlayerNote(Color color, Color borderColor, Color colorClick){
-        super(color,borderColor);
+    PlayerNote(Color color, Color borderColor, Color colorClick) {
+        super(color, borderColor);
         this.released = false;
         this.colorClick = colorClick;
     }
@@ -26,9 +26,9 @@ public class PlayerNote extends Note{
 
     public void setReleased(boolean released) {
         this.released = released;
-        if (released){
+        if (released) {
             setBackground(colorClick);
-        }else{
+        } else {
             setBackground(color);
         }
         repaint();
@@ -37,7 +37,7 @@ public class PlayerNote extends Note{
     @Override
     protected void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         //  Paint Border
         g2.setColor(borderColor);

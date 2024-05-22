@@ -1,7 +1,6 @@
 package Player;
 
 import Connection.mysqlConnection;
-import Player.GameNote;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,6 +12,7 @@ public class Tab extends JPanel {
 
     mysqlConnection connection;
     Player player;
+    Menu menu;
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     int ypos = (int) screenSize.getHeight() - 100;
     int xpos = (int) (screenSize.getWidth() - 300) / 2;
@@ -27,16 +27,20 @@ public class Tab extends JPanel {
     PlayerNote orangeNote = new PlayerNote(new Color(54, 58, 59), new Color(217, 147, 53), new Color(217, 147, 53));
     ArrayList<GameNote> notes;
     NoteGenerator ng;
+    private boolean paused = false;
 
     public Tab(Player player) {
-        //connection = new mysqlConnection();
+        this(player, 1);
+    }
+
+    public Tab(Player player, int playerNumber) {
         this.player = player;
         setLayout(null);
         setPreferredSize(new Dimension((int) (screenSize.getWidth()), (int) screenSize.getHeight()));
-        noteStreak.setBounds(screenSize.width-145, 15, 100, 15);
-        multiplier.setBounds(screenSize.width-145, 30, 100, 15);
-        score.setBounds(screenSize.width-145, 45, 100, 15);
-        life.setBounds(screenSize.width-145, 60, 100, 15);
+        noteStreak.setBounds(screenSize.width - 145, 15, 100, 15);
+        multiplier.setBounds(screenSize.width - 145, 30, 100, 15);
+        score.setBounds(screenSize.width - 145, 45, 100, 15);
+        life.setBounds(screenSize.width - 145, 60, 100, 15);
         greenNote.setBounds(xpos, ypos, 50, 50);
         redNote.setBounds(xpos + 75, ypos, 50, 50);
         yellowNote.setBounds(xpos + 150, ypos, 50, 50);
@@ -52,27 +56,50 @@ public class Tab extends JPanel {
         add(yellowNote);
         add(blueNote);
         add(orangeNote);
-        KB();
+        KB(playerNumber);
         setFocusable(true);
         ng = new NoteGenerator("Note Generator");
         notes = ng.getNotes();
     }
 
+    //Setters
+
+    public void setYpos(int ypos) {
+        this.ypos = ypos;
+    }
+
+    public void setXpos(int xpos) {
+        this.xpos = xpos;
+    }
+
+    //Getters
+
+    public int getYpos() {
+        return ypos;
+    }
+
+    public int getXpos() {
+        return xpos;
+    }
+
+    // Methods
     @Override
     protected void paintComponent(Graphics g) {
-        int oldNoteStreak = player.noteStreak;
         super.paintComponent(g);
-        drawLines(g, xpos, ypos);
-        g.fillRect(0, 0, screenSize.width, screenSize.height);
-        if (!notes.isEmpty()) {
-            paintNotes();
+        if (!paused) {
+            int oldNoteStreak = player.noteStreak;
+            drawLines(g, xpos, ypos);
+            g.fillRect(0, 0, screenSize.width, screenSize.height);
+            if (!notes.isEmpty()) {
+                paintNotes();
+            }
+            if (oldNoteStreak != player.noteStreak) {
+                noteStreak.setText("Note Streak: " + player.noteStreak);
+            }
+            score.setText("Score: " + player.score);
+            multiplier.setText("Multiplier: " + player.multiplier + "x");
+            life.setText("Life: " + player.life);
         }
-        if (oldNoteStreak != player.noteStreak){
-            noteStreak.setText("Note Streak: " + player.noteStreak);
-        }
-        score.setText("Score: " + player.score);
-        multiplier.setText("Multiplier: " + player.multiplier + "x");
-        life.setText("Life: " + player.life);
     }
 
     private void drawLines(Graphics g, int xpos, int ypos) {
@@ -87,7 +114,6 @@ public class Tab extends JPanel {
 
         g.setColor(new Color(128, 128, 128, 128));
         g.fillRect(xpos - 25, 0, 400, ypos + 75);
-
     }
 
     public void paintNotes() {
@@ -99,17 +125,16 @@ public class Tab extends JPanel {
                 add(element);
                 element.setAdded(true);
             }
-            element.physics();   
-            synchronized (ng){
+            element.physics();
+            synchronized (ng) {
                 if (element.getY() >= ypos && element.getY() <= ypos + 50) {
-                    if ((element.getColor().equals(greenNote.getColor()) && greenNote.isReleased() && element.getX() == xpos) ||
-                            (element.getColor().equals(redNote.getColor()) && redNote.isReleased() && element.getX() == xpos + 75) ||
-                            (element.getColor().equals(yellowNote.getColor()) && yellowNote.isReleased() && element.getX() == xpos + 150) ||
-                            (element.getColor().equals(blueNote.getColor()) && blueNote.isReleased() && element.getX() == xpos + 225) ||
-                            (element.getColor().equals(orangeNote.getColor()) && orangeNote.isReleased() && element.getX() == xpos + 300)) {
+                    if ((element.getColor().equals(greenNote.getBorderColor()) && greenNote.isReleased() && element.getX() == xpos) ||
+                            (element.getColor().equals(redNote.getBorderColor()) && redNote.isReleased() && element.getX() == xpos + 75) ||
+                            (element.getColor().equals(yellowNote.getBorderColor()) && yellowNote.isReleased() && element.getX() == xpos + 150) ||
+                            (element.getColor().equals(blueNote.getBorderColor()) && blueNote.isReleased() && element.getX() == xpos + 225) ||
+                            (element.getColor().equals(orangeNote.getBorderColor()) && orangeNote.isReleased() && element.getX() == xpos + 300)) {
                         iterator.remove();
                         remove(element);
-                        notes.remove(element);
                         player.score += 50 * player.multiplier;
                         player.noteStreak++;
                         if (player.noteStreak % 10 == 0 && player.multiplier <= 4) {
@@ -119,11 +144,9 @@ public class Tab extends JPanel {
                             player.life += 5;
                         }
                     }
-                }
-                else if (element.getY() == screenSize.height /*> screenSize.height + 50*/) {
+                } else if (element.getY() >= screenSize.height) {
                     iterator.remove();
                     remove(element);
-                    notes.remove(element);
                     player.resetNoteStreak();
                     player.resetMultiplier();
                     if (player.life == 0) {
@@ -136,13 +159,7 @@ public class Tab extends JPanel {
         }
     }
 
-
-
-    public void draw() throws Exception {
-        SwingUtilities.invokeAndWait(this::repaint);
-    }
-
-    private void KB() {
+    public void KB(int playerNumber) {
         KeyListener kb = new KeyListener() {
             @Override
             public void keyTyped(KeyEvent e) {
@@ -150,60 +167,129 @@ public class Tab extends JPanel {
 
             @Override
             public void keyPressed(KeyEvent e) {
-                switch (e.getKeyCode()) {
-                    case KeyEvent.VK_A:
-                        greenNote.setReleased(true);
-                        break;
-                    case KeyEvent.VK_S:
-                        redNote.setReleased(true);
-                        break;
-                    case KeyEvent.VK_D:
-                        yellowNote.setReleased(true);
-                        break;
-                    case KeyEvent.VK_F:
-                        blueNote.setReleased(true);
-                        break;
-                    case KeyEvent.VK_G:
-                        orangeNote.setReleased(true);
-                        break;
+                if (playerNumber == 1) {
+                    switch (e.getKeyCode()) {
+                        case KeyEvent.VK_A:
+                            greenNote.setReleased(true);
+                            break;
+                        case KeyEvent.VK_S:
+                            redNote.setReleased(true);
+                            break;
+                        case KeyEvent.VK_D:
+                            yellowNote.setReleased(true);
+                            break;
+                        case KeyEvent.VK_F:
+                            blueNote.setReleased(true);
+                            break;
+                        case KeyEvent.VK_G:
+                            orangeNote.setReleased(true);
+                            break;
+                        case KeyEvent.VK_ESCAPE:
+                            togglePause();
+                            break;
+                    }
+                } else if (playerNumber == 2) {
+                    switch (e.getKeyCode()) {
+                        case KeyEvent.VK_J:
+                            greenNote.setReleased(true);
+                            break;
+                        case KeyEvent.VK_K:
+                            redNote.setReleased(true);
+                            break;
+                        case KeyEvent.VK_L:
+                            yellowNote.setReleased(true);
+                            break;
+                        case KeyEvent.VK_SEMICOLON:
+                            blueNote.setReleased(true);
+                            break;
+                        case KeyEvent.VK_QUOTE:
+                            orangeNote.setReleased(true);
+                            break;
+                        case KeyEvent.VK_ESCAPE:
+                            togglePause();
+                            break;
+                    }
                 }
             }
 
             @Override
             public void keyReleased(KeyEvent e) {
-                switch (e.getKeyCode()) {
-                    case KeyEvent.VK_A:
-                        greenNote.setReleased(false);
-                        break;
-                    case KeyEvent.VK_S:
-                        redNote.setReleased(false);
-                        break;
-                    case KeyEvent.VK_D:
-                        yellowNote.setReleased(false);
-                        break;
-                    case KeyEvent.VK_F:
-                        blueNote.setReleased(false);
-                        break;
-                    case KeyEvent.VK_G:
-                        orangeNote.setReleased(false);
-                        break;
+                if (playerNumber == 1) {
+                    switch (e.getKeyCode()) {
+                        case KeyEvent.VK_A:
+                            greenNote.setReleased(false);
+                            break;
+                        case KeyEvent.VK_S:
+                            redNote.setReleased(false);
+                            break;
+                        case KeyEvent.VK_D:
+                            yellowNote.setReleased(false);
+                            break;
+                        case KeyEvent.VK_F:
+                            blueNote.setReleased(false);
+                            break;
+                        case KeyEvent.VK_G:
+                            orangeNote.setReleased(false);
+                            break;
+                    }
+                } else if (playerNumber == 2) {
+                    switch (e.getKeyCode()) {
+                        case KeyEvent.VK_J:
+                            greenNote.setReleased(false);
+                            break;
+                        case KeyEvent.VK_K:
+                            redNote.setReleased(false);
+                            break;
+                        case KeyEvent.VK_L:
+                            yellowNote.setReleased(false);
+                            break;
+                        case KeyEvent.VK_DEAD_TILDE:
+                            blueNote.setReleased(false);
+                            break;
+                        case KeyEvent.VK_OPEN_BRACKET:
+                            orangeNote.setReleased(false);
+                            break;
+                    }
                 }
             }
         };
         this.addKeyListener(kb);
     }
 
-
-    public void play() throws Exception {
-        while (true) {
-            draw();
-            try {
-                Thread.sleep(2);
-            } catch (InterruptedException e) {
-                System.out.println("Error: " + e.getMessage());
+    public void play() {
+        Thread gameThread = new Thread(() -> {
+            while (true) {
+                if (!paused) {
+                    draw();
+                }
+                try {
+                    Thread.sleep(2);
+                } catch (InterruptedException e) {
+                    System.out.println("Error: " + e.getMessage());
+                }
             }
+        });
+        gameThread.start();
+        SwingUtilities.invokeLater(this::requestFocusInWindow);
+    }
+
+    private void draw() {
+        repaint();
+    }
+
+    void togglePause() {
+        paused = !paused;
+        if (paused) {
+            menu = new Menu();
+            menu.setBounds(0, 0, screenSize.width, screenSize.height);
+            this.add(menu);
+            menu.setVisible(true);
+            menu.requestFocusInWindow();
+        } else {
+            this.remove(menu);
+            this.requestFocusInWindow();
         }
+        this.revalidate();
+        this.repaint();
     }
 }
-
-    
