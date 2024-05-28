@@ -10,16 +10,18 @@ public class GameNote extends Note {
     private int x;
     private int y;
     boolean added;
+    private int time;
 
     public GameNote(Color color, Color borderColor) {
         super(color, borderColor);
     }
 
     
-    public GameNote(Color color) {
+    public GameNote(Color color, int time) {
         super(color);
         this.x = 10;
         this.y = 0;
+        this.time = time;
     }
 
     
@@ -57,6 +59,9 @@ public class GameNote extends Note {
 
     public void setAdded(boolean added) {
         this.added = added;
+    }
+    public int getTime() {
+        return time;
     }
     
     @Override

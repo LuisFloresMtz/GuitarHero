@@ -4,7 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 
 public class Menu extends JPanel {
-    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
     public Menu() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));

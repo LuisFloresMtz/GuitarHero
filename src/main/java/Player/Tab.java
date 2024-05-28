@@ -2,15 +2,18 @@ package Player;
 
 import Connection.mysqlConnection;
 
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 public class Tab extends JPanel {
 
-    mysqlConnection connection;
+    //mysqlConnection connection;
     Player player;
     Menu menu;
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -26,14 +29,14 @@ public class Tab extends JPanel {
     PlayerNote blueNote = new PlayerNote(new Color(54, 58, 59), new Color(63, 162, 211), new Color(63, 162, 211));
     PlayerNote orangeNote = new PlayerNote(new Color(54, 58, 59), new Color(217, 147, 53), new Color(217, 147, 53));
     ArrayList<GameNote> notes;
-    NoteGenerator ng;
+    final NoteGenerator ng;
     private boolean paused = false;
 
-    public Tab(Player player) {
+    public Tab(Player player) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
         this(player, 1);
     }
 
-    public Tab(Player player, int playerNumber) {
+    public Tab(Player player, int playerNumber) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
         this.player = player;
         setLayout(null);
         setPreferredSize(new Dimension((int) (screenSize.getWidth()), (int) screenSize.getHeight()));
@@ -58,7 +61,7 @@ public class Tab extends JPanel {
         add(orangeNote);
         KB(playerNumber);
         setFocusable(true);
-        ng = new NoteGenerator("Note Generator");
+        ng = new NoteGenerator("Note Generator",this);
         notes = ng.getNotes();
     }
 
@@ -280,16 +283,19 @@ public class Tab extends JPanel {
     void togglePause() {
         paused = !paused;
         if (paused) {
+            ng.pauseAudio();
             menu = new Menu();
             menu.setBounds(0, 0, screenSize.width, screenSize.height);
             this.add(menu);
             menu.setVisible(true);
             menu.requestFocusInWindow();
         } else {
+            ng.resumeAudio();
             this.remove(menu);
             this.requestFocusInWindow();
         }
         this.revalidate();
         this.repaint();
     }
+
 }

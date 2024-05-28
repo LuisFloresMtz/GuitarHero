@@ -40,7 +40,7 @@ public class GameMenu extends JPanel {
         btnEditor.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                openEditor();
+                switchToEdit(frame);
             }
         });
     }
@@ -73,27 +73,35 @@ public class GameMenu extends JPanel {
             ex.printStackTrace();
         }
     }
+    private void switchToEdit(JFrame frame) {
+        try {
+            fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            fileChooser.setMultiSelectionEnabled(false);
+            fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("*.txt", "txt"));
+            fileChooser.setAcceptAllFileFilterUsed(false);
+            fileChooser.setDialogTitle("Select a song");
+            fileChooser.showOpenDialog(null);
 
-    private void openEditor() {
-        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        fileChooser.setMultiSelectionEnabled(false);
-        fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("*.txt", "txt"));
-        fileChooser.setAcceptAllFileFilterUsed(false);
-        fileChooser.setDialogTitle("Select a song");
-        fileChooser.showOpenDialog(null);
-
-        if (fileChooser.getSelectedFile() != null) {
-            String path = fileChooser.getSelectedFile().getAbsolutePath();
-            String name = fileChooser.getSelectedFile().getName();
-            String newPath = "src/main/java/Resources/Songs/" + name;
-            try {
-                java.nio.file.Files.copy(java.nio.file.Paths.get(path), java.nio.file.Paths.get(newPath), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-            } catch (Exception ex) {
-                System.out.println(ex.getMessage());
+            if (fileChooser.getSelectedFile() != null) {
+                String path = fileChooser.getSelectedFile().getAbsolutePath();
+                String name = fileChooser.getSelectedFile().getName();
+                String newPath = "src/main/java/Resources/Songs/" + name;
+                try {
+                    java.nio.file.Files.copy(java.nio.file.Paths.get(path), java.nio.file.Paths.get(newPath), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                } catch (Exception ex) {
+                    System.out.println(ex.getMessage());
+                }
+                Editor editor = new Editor(newPath);
+                frame.getContentPane().removeAll();
+                frame.getContentPane().add(editor);
+                frame.revalidate();
+                frame.repaint();
             }
-            //Editor editor = new Editor(String newPath);
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
+
 
 
 }
