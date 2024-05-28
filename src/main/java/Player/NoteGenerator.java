@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class NoteGenerator extends Thread {
     final ArrayList<GameNote> notes;
@@ -45,8 +46,8 @@ public class NoteGenerator extends Thread {
                 inNotesSection = true;
             } else if (line.startsWith("[")) {
                 inNotesSection = false;
-            } else if (line.startsWith("{")) {
-                inNotesSection = false;
+            } else if (inNotesSection && line.startsWith("{")) {
+                continue;
             } else if (inNotesSection && !line.isEmpty()) {
                 processNoteLine(line);
             }
@@ -55,23 +56,26 @@ public class NoteGenerator extends Thread {
     }
 
     private void processNoteLine(String line) {
-        String[] parts = line.split(" = ");
-        int time = Integer.parseInt(parts[0].trim());
-        String[] noteParts = parts[1].split(" ");
-        int track = Integer.parseInt(noteParts[1].trim());
-        if (track >= 0 && track <= 4) {
-            GameNote note = switch (track) {
-                case 0 -> new GameNote(new Color(8, 200, 3), time);
-                case 1 -> new GameNote(new Color(163, 24, 24), time);
-                case 2 -> new GameNote(new Color(254, 254, 53), time);
-                case 3 -> new GameNote(new Color(63, 162, 211), time);
-                case 4 -> new GameNote(new Color(217, 147, 53), time);
-                default -> null;
-            };
-            if (note != null) {
+        try {
+            String[] parts = line.split(" = ");
+
+            int time = Integer.parseInt(parts[0].trim());
+            String[] noteParts = parts[1].split(" ");
+
+            int track = Integer.parseInt(noteParts[1].trim());
+            if (track >= 0 && track <= 4) {
+                GameNote note = switch (track) {
+                    case 0 -> new GameNote(xpos, 0, new Color(8, 200, 3), time);
+                    case 1 -> new GameNote(xpos + 75, 0, new Color(163, 24, 24), time);
+                    case 2 -> new GameNote(xpos + 150, 0, new Color(254, 254, 53), time);
+                    case 3 -> new GameNote(xpos + 225, 0, new Color(63, 162, 211), time);
+                    case 4 -> new GameNote(xpos + 300, 0, new Color(217, 147, 53), time);
+                    default -> null;
+                };
                 notes.add(note);
-                note.setBounds(xpos + track * 75, 0, note.getRadius(), note.getRadius());
             }
+        } catch (NumberFormatException e) {
+            System.err.println("Error parsing line: " + line + " - " + e.getMessage());
         }
     }
 
@@ -98,22 +102,21 @@ public class NoteGenerator extends Thread {
         clip.stop();
     }
 
-
     @Override
     public void run() {
-        try {
-            Thread.sleep(1500);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         playAudio();
         Timer timer = new Timer(50, e -> {
-            long elapsedTime = System.currentTimeMillis() - startTime;
+            long elapsedTime = clip.getMicrosecondPosition() / 1000; // Convert microseconds to milliseconds
             synchronized (notes) {
-                for (GameNote note : notes) {
+                Iterator<GameNote> iterator = notes.iterator();
+                while (iterator.hasNext()) {
+                    GameNote note = iterator.next();
                     if (elapsedTime >= note.getTime()) {
-                        int newY = ypos - (int)((elapsedTime - note.getTime()) * 0.1); // Adjust the speed
+                        int newY = note.getY() + 1;
                         note.setLocation(note.getX(), newY);
+                        if (newY > ypos) {
+                            iterator.remove();
+                        }
                     }
                 }
                 panel.repaint();

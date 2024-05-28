@@ -25,12 +25,14 @@ public class GameNote extends Note {
     }
 
     
-    public GameNote(int x, int y, Color color) {
+    public GameNote(int x, int y, Color color, int time) {
         super(color, color);
         this.x = x;
         this.y = y;
         this.added = false;
+        this.time = time;
     }
+
 
     public int getX() {
         return x;
