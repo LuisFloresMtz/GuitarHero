@@ -53,11 +53,11 @@ public class Tab extends JPanel {
         multiplier.setBounds(screenSize.width - 145, 30, 100, 15);
         score.setBounds(screenSize.width - 145, 45, 100, 15);
         life.setBounds(screenSize.width - 145, 60, 100, 15);
-        greenNote.setBounds(xpos, ypos, 50, 50);
-        redNote.setBounds(xpos + 75, ypos, 50, 50);
-        yellowNote.setBounds(xpos + 150, ypos, 50, 50);
-        blueNote.setBounds(xpos + 225, ypos, 50, 50);
-        orangeNote.setBounds(xpos + 300, ypos, 50, 50);
+        greenNote.setBounds(xpos, ypos, 50, 35);
+        redNote.setBounds(xpos + 75, ypos, 50, 35);
+        yellowNote.setBounds(xpos + 150, ypos, 50, 35);
+        blueNote.setBounds(xpos + 225, ypos, 50, 35);
+        orangeNote.setBounds(xpos + 300, ypos, 50, 35);
 
         add(noteStreak);
         add(multiplier);
@@ -110,13 +110,13 @@ public class Tab extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        /*Graphics2D g2d = (Graphics2D) g.create();
+        Graphics2D g2d = (Graphics2D) g.create();
         g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.8f));
         Image gifImage = gifIcon.getImage();
         g2d.drawImage(gifImage, 0, 0, getWidth(), getHeight(), this);
-        g2d.dispose();*/
-        Image gifImage = gifIcon.getImage();
-        g.drawImage(gifImage, 0, 0, getWidth(), getHeight(), this);
+        g2d.dispose();
+        //Image gifImage = gifIcon.getImage();
+        //g.drawImage(gifImage, 0, 0, getWidth(), getHeight(), this);
         //g.drawImage(backGround,(int)50,170 - 100, 100, 100, this);
         if (!paused) {
             int oldNoteStreak = player.noteStreak;
@@ -154,7 +154,7 @@ public class Tab extends JPanel {
         while (iterator.hasNext()) {
         //for(GameNote element : notesInScreen) {
             GameNote element = iterator.next();
-            if(elapsedTime >= element.getTime()-dt) {
+            if(elapsedTime >= element.getTime() - dt) {
                 if (!element.isAdded() /*&& (elapsedTime) >= (element.getTime())*/) {
                     //element.setBounds(element.getX(), element.getY(), 50, 50);
                     //add(element);
@@ -166,8 +166,8 @@ public class Tab extends JPanel {
                 }
                 if(element.isAdded()){
                     //element.setBounds(element.getX(), element.getY(), 50, 50);
-                    g.setColor(new Color(235,245,251));
-                    g.fillOval(element.getX(), element.getY(), 50, 50);
+                    g.setColor(element.getBorderColor());
+                    g.fillOval(element.getX(), element.getY(), 50, 35);
                     element.physics((double)ypos,(double)dt);
                 }
             }

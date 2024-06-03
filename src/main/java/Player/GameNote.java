@@ -11,7 +11,7 @@ public class GameNote extends Note {
     private double y;
     boolean added;
     private int time;
-    private static int speed = 1500;
+    private static int speed = 1750;
 
     public GameNote(Color color, Color borderColor) {
         super(color, borderColor);
@@ -59,6 +59,7 @@ public class GameNote extends Note {
     
     public void physics(double ypos, double dt) {
         y += speed/1000f;
+        //y += ypos/dt;
         //System.out.println(y);
     }
 
