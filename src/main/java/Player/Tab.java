@@ -1,6 +1,8 @@
 package Player;
 
 import Connection.mysqlConnection;
+import Scenes.Menu.Menu3D;
+import Scenes.Menu.PauseMenu;
 
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -15,7 +17,7 @@ public class Tab extends JPanel {
 
     //mysqlConnection connection;
     Player player;
-    Menu menu;
+    Menu3D menu;
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     int ypos = (int) screenSize.getHeight() - 100;
     int xpos = (int) (screenSize.getWidth() - 300) / 2;
@@ -284,8 +286,10 @@ public class Tab extends JPanel {
         paused = !paused;
         if (paused) {
             ng.pauseAudio();
-            menu = new Menu();
-            menu.setBounds(0, 0, screenSize.width, screenSize.height);
+            menu = new PauseMenu();
+            int menuWidth = 600;
+            int menuHeight = 500;
+            menu.setBounds(500, 50, menuWidth, menuHeight);
             this.add(menu);
             menu.setVisible(true);
             menu.requestFocusInWindow();

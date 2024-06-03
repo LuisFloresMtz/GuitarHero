@@ -1,6 +1,4 @@
-import Connection.mysqlConnection;
-import Player.Player;
-import Scenes.GameMenu;
+import Scenes.Menu.GameMenu;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,6 +10,14 @@ public class Main {
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         JFrame game = new JFrame("Game");
+        game.setUndecorated(true);
+        game.setExtendedState(JFrame.MAXIMIZED_BOTH);
+
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        Image image = toolkit.createImage(new byte[0]);
+        Cursor transparentCursor = toolkit.createCustomCursor(image, new Point(0, 0), "invisibleCursor");
+        game.setCursor(transparentCursor);
+
 
         game.setPreferredSize(new Dimension((int) screenSize.getWidth(), (int) screenSize.getHeight()));
         game.setResizable(false);
