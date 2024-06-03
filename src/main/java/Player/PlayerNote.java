@@ -4,12 +4,14 @@ import java.awt.*;
 
 public class PlayerNote extends Note {
     private boolean released;
+    private boolean clicked;
     private Color colorClick;
 
     PlayerNote(Color color, Color borderColor, Color colorClick) {
         super(color, borderColor);
         this.released = false;
         this.colorClick = colorClick;
+        this.clicked = false;
     }
 
     public Color getColorClick() {
@@ -32,6 +34,14 @@ public class PlayerNote extends Note {
             setBackground(color);
         }
         repaint();
+    }
+
+    public boolean isClicked() {
+        return clicked;
+    }
+
+    public void setClicked(boolean clicked) {
+        this.clicked = clicked;
     }
 
     @Override

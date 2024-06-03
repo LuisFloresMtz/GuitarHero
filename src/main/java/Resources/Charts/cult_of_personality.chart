@@ -1,20 +1,4 @@
-﻿[Song]
-{
-  Name = "Cult of Personality"
-  Charter = "C.H. Uruguay"
-  Offset = 0
-  Resolution = 192
-  Player2 = bass
-  Difficulty = 0
-  PreviewStart = 0
-  PreviewEnd = 0
-  Genre = "rock"
-  MediaType = "cd"
-  GuitarStream = "guitar.opus"
-  BassStream = "bass.opus"
-  DrumStream = "drums.opus"
-  VocalStream = "vocals.opus"
-}
+
 [ExpertSingle]
 {
   3840 = N 0 0
