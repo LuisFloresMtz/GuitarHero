@@ -80,7 +80,7 @@ public class Tab extends JPanel {
             System.exit(1);
         }
         //notesInScreen = new CopyOnWriteArrayList<>();*/
-        gifIcon = new ImageIcon("/C:/Users/Diego/Downloads/video.gif/");
+        gifIcon = new ImageIcon("src/main/java/Resources/BackGrounds/Ella_y_yo.gif/");
         /*gifLabel = new JLabel(gifIcon);
         /*gifLabel.setBounds(0, 0, (int)screenSize.getWidth(), (int)screenSize.getHeight());
         add(gifLabel);*/
