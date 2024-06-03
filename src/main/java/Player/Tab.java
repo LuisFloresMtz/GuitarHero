@@ -174,11 +174,16 @@ public class Tab extends JPanel {
             //synchronized (ng) {
                 if (element.getY() >= ypos && element.getY() <= ypos + 100) {
                  
-                    if ((greenNote.isReleased() && element.getX() == xpos) ||
-                            (redNote.isReleased() && element.getX() == xpos + 75) ||
-                            (yellowNote.isReleased() && element.getX() == xpos + 150) ||
-                            (blueNote.isReleased() && element.getX() == xpos + 225) ||
-                            (orangeNote.isReleased() && element.getX() == xpos + 300)) {
+                    if ((greenNote.isReleased() && greenNote.isClicked() && element.getX() == xpos) ||
+                            (redNote.isReleased() && redNote.isClicked() && element.getX() == xpos + 75) ||
+                            (yellowNote.isReleased() && yellowNote.isClicked() && element.getX() == xpos + 150) ||
+                            (blueNote.isReleased() && blueNote.isClicked() && element.getX() == xpos + 225) ||
+                            (orangeNote.isReleased() && orangeNote.isClicked() && element.getX() == xpos + 300)) {
+                        if(element.getX() == xpos) greenNote.setClicked(false);
+                        if(element.getX() == xpos + 75) redNote.setClicked(false);
+                        if(element.getX() == xpos + 150) yellowNote.setClicked(false);
+                        if(element.getX() == xpos + 225) blueNote.setClicked(false);
+                        if(element.getX() == xpos + 300) orangeNote.setClicked(false);
                         iterator.remove();
                         remove(element);
                         element.setAdded(false);
@@ -214,7 +219,7 @@ public class Tab extends JPanel {
     public void KB(int playerNumber) {
         KeyListener kb = new KeyListener() {
             @Override
-            public void keyTyped(KeyEvent e) {
+            public void keyTyped(KeyEvent e) {            
             }
 
             @Override
@@ -270,18 +275,23 @@ public class Tab extends JPanel {
                     switch (e.getKeyCode()) {
                         case KeyEvent.VK_A:
                             greenNote.setReleased(false);
+                            greenNote.setClicked(true);
                             break;
                         case KeyEvent.VK_S:
                             redNote.setReleased(false);
+                            redNote.setClicked(true);
                             break;
                         case KeyEvent.VK_D:
                             yellowNote.setReleased(false);
+                            yellowNote.setClicked(true);
                             break;
                         case KeyEvent.VK_F:
                             blueNote.setReleased(false);
+                            blueNote.setClicked(true);
                             break;
                         case KeyEvent.VK_G:
                             orangeNote.setReleased(false);
+                            orangeNote.setClicked(true);
                             break;
                     }
                 } else if (playerNumber == 2) {
@@ -345,6 +355,7 @@ public class Tab extends JPanel {
                         notes.remove(element);
                     }
                 }*/
+                
                 try {
                     Thread.sleep(1);
                 } catch (InterruptedException e) {
