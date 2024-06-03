@@ -7,15 +7,23 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 
 public class GameNote extends Note {
-    private int x;
-    private int y;
+    private double x;
+    private double y;
     boolean added;
     private int time;
+    private static int speed = 1500;
 
     public GameNote(Color color, Color borderColor) {
         super(color, borderColor);
     }
 
+    public GameNote(int x, Color color, Color borderColor, int time) {
+        super(color, borderColor);
+        this.x = (double)x;
+        this.y = 0;
+        this.time = time;
+        this.added = false;
+    }
     
     public GameNote(Color color, int time) {
         super(color);
@@ -33,24 +41,25 @@ public class GameNote extends Note {
     }
 
     public int getX() {
-        return x;
+        return (int)x;
     }
 
-    public void setX(int x) {
+    public void setX(double x) {
         this.x = x;
     }
 
     public int getY() {
-        return y;
+        return (int)y;
     }
 
-    public void setY(int y) {
+    public void setY(double y) {
         this.y = y;
     }
     
     
-    public void physics() {
-        y += 2;
+    public void physics(double ypos, double dt) {
+        y += speed/1000f;
+        //System.out.println(y);
     }
 
     public boolean isAdded() {
@@ -62,6 +71,14 @@ public class GameNote extends Note {
     }
     public int getTime() {
         return time;
+    }
+
+    public static void setSpeed(int speed) {
+        GameNote.speed = speed;
+    }
+
+    public static int getSpeed() {
+        return speed;
     }
     
     @Override

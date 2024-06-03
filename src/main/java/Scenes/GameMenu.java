@@ -47,13 +47,13 @@ public class GameMenu extends JPanel {
 
     private void switchToOnePlayerScene(JFrame frame) {
         try {
-            Player player1 = new Player();
+            //Player player1 = new Player();
             OnePlayerScene onePlayerPanel = new OnePlayerScene();
             frame.getContentPane().removeAll();
             frame.getContentPane().add(onePlayerPanel);
             frame.revalidate();
             frame.repaint();
-            player1.tab.play();
+            //player1.tab.play();
         } catch (Exception ex) {
             ex.printStackTrace();
         }

@@ -9,7 +9,6 @@ import java.awt.event.WindowEvent;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         JFrame game = new JFrame("Game");
 
