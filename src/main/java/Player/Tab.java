@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 import javax.imageio.ImageIO;
 
 public class Tab extends JPanel {
@@ -32,8 +33,6 @@ public class Tab extends JPanel {
     PlayerNote blueNote = new PlayerNote(new Color(54, 58, 59), new Color(63, 162, 211), new Color(63, 162, 211));
     PlayerNote orangeNote = new PlayerNote(new Color(54, 58, 59), new Color(217, 147, 53), new Color(217, 147, 53));
     ArrayList<GameNote> notes;
-    //ArrayList<GameNote> notesInScreen;
-    CopyOnWriteArrayList<GameNote> notesInScreen;
     final NoteGenerator ng;
     private boolean paused = false;
     long elapsedTime;
@@ -154,8 +153,8 @@ public class Tab extends JPanel {
         while (iterator.hasNext()) {
         //for(GameNote element : notesInScreen) {
             GameNote element = iterator.next();
-            if(elapsedTime >= element.getTime() - dt) {
-                if (!element.isAdded() /*&& (elapsedTime) >= (element.getTime())*/) {
+            /*if(elapsedTime >= element.getTime() - dt) {
+                if (!element.isAdded() /*&& (elapsedTime) >= (element.getTime())) {
                     //element.setBounds(element.getX(), element.getY(), 50, 50);
                     //add(element);
                     element.setAdded(true);
@@ -163,16 +162,17 @@ public class Tab extends JPanel {
                     //System.out.println("TIEMPO TRANSCURRIDO: " + elapsedTime);
                     //System.out.println("TIEMPO DE APARICION DE NOTA: " + (element.getTime() - dt));
 
-                }
-                if(element.isAdded()){
+                }*/
+                if(element.isInScreen()){
                     //element.setBounds(element.getX(), element.getY(), 50, 50);
                     g.setColor(element.getBorderColor());
                     g.fillOval(element.getX(), element.getY(), 50, 35);
-                    element.physics((double)ypos,(double)dt);
+                    //element.physics((double)ypos,(double)dt);
                 }
-            }
+            //}
             //synchronized (ng) {
-                if (element.getY() >= ypos && element.getY() <= ypos + 100) {
+                //if (element.getY() >= 50) {
+                if (element.getY() >= ypos && element.getY() <= ypos + 100 && element.isInScreen()) {
                  
                     if ((greenNote.isReleased() && greenNote.isClicked() && element.getX() == xpos) ||
                             (redNote.isReleased() && redNote.isClicked() && element.getX() == xpos + 75) ||
@@ -184,11 +184,12 @@ public class Tab extends JPanel {
                         if(element.getX() == xpos + 150) yellowNote.setClicked(false);
                         if(element.getX() == xpos + 225) blueNote.setClicked(false);
                         if(element.getX() == xpos + 300) orangeNote.setClicked(false);
-                        iterator.remove();
-                        remove(element);
-                        element.setAdded(false);
+                        //iterator.remove();
+                        //remove(element);
+                        element.setInScreen(false);
+                        element.setScored(true);
                         //notesInScreen.remove(element);
-                        notes.remove(element);
+                        //notes.remove(element);
                         player.score += 50 * player.multiplier;
                         player.noteStreak++;
                         if (player.noteStreak % 10 == 0 && player.multiplier <= 4) {
@@ -198,12 +199,8 @@ public class Tab extends JPanel {
                             player.life += 5;
                         }
                     }
-                } else if (element.getY() >= screenSize.height) {
-                    iterator.remove();
-                    remove(element);
-                    element.setAdded(false);
-                    //notesInScreen.remove(element);
-                    notes.remove(element);
+                } else if (element.getY() >= screenSize.height && !element.isScored() && element.isInScreen()) {
+                    element.setInScreen(false);
                     player.resetNoteStreak();
                     player.resetMultiplier();
                     if (player.life == 0) {
@@ -319,52 +316,19 @@ public class Tab extends JPanel {
     }
 
     public void play() {
-        //ng.playAudio();
-        
-        dt = (long)((ypos - 50/((float)GameNote.getSpeed()) * 1000f));
-        //long startTime = System.currentTimeMillis();
         Thread gameThread = new Thread(() -> {
             while (true) {
-                //System.out.println("ass");
                 if (!paused) {
                     draw();
                     try {
-                        Thread.sleep(1);
+                        TimeUnit.NANOSECONDS.sleep(1000);
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
-                    //elapsedTime = System.currentTimeMillis() - startTime;*/
-                    //System.out.println(dt); 384
-                    //System.out.println(ypos);
                 }
             }
         });
-        Thread timer = new Thread(() -> {
-            ng.playAudio();
-            long startTime = System.currentTimeMillis();
-            
-            while(true) {
-                ///Iterator<GameNote> iterator = notes.iterator();
-                elapsedTime = System.currentTimeMillis() - startTime;
-                //System.out.println(elapsedTime);
-                /*while(iterator.hasNext()) {
-                    GameNote element = iterator.next();
-                    if((elapsedTime) >= element.getTime()-dt){
-                        notesInScreen.add(element);
-                        iterator.remove();
-                        notes.remove(element);
-                    }
-                }*/
-                
-                try {
-                    Thread.sleep(1);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-           } 
-        });
-        timer.start();
-        //SwingUtilities.invokeLater(this::requestFocusInWindow);
+        ng.start();
         gameThread.start();
         SwingUtilities.invokeLater(this::requestFocusInWindow);
     }
