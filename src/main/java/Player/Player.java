@@ -2,6 +2,7 @@ package Player;
 
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.swing.*;
 import java.io.IOException;
 
 public class Player {
@@ -12,17 +13,20 @@ public class Player {
     int powerPorcentage;
     int score;
     String chartPath;
+    String selectedSong;
 
-    public Player() throws IOException, UnsupportedAudioFileException, LineUnavailableException {
-        this.tab = new Tab(this);
+    public Player(String selectedSong, JFrame frame) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
+        this.tab = new Tab(this, 1,selectedSong, frame);
         this.life = 50;
         this.noteStreak = 0;
         this.multiplier = 1;
         this.powerPorcentage = 0;
         this.score = 0;
+        this.selectedSong = selectedSong;
     }
-    public Player(int playerNumber) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
-        this.tab = new Tab(this, playerNumber);
+    public Player(int playerNumber, String selectedSong, JFrame frame) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
+        this.selectedSong = selectedSong;
+        this.tab = new Tab(this, playerNumber, selectedSong, frame);
         this.life = 50;
         this.noteStreak = 0;
         this.multiplier = 1;

@@ -1,23 +1,26 @@
 package Player;
 
 import Connection.mysqlConnection;
+import Scenes.Menu.GameMenu;
 import Scenes.Menu.Menu3D;
 import Scenes.Menu.PauseMenu;
+import com.studiohartman.jamepad.ControllerManager;
+import com.studiohartman.jamepad.ControllerState;
+
 
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.CopyOnWriteArrayList;
-import javax.imageio.ImageIO;
 
 public class Tab extends JPanel {
 
+    JFrame frame;
     //mysqlConnection connection;
     Player player;
     Menu3D menu;
@@ -42,12 +45,10 @@ public class Tab extends JPanel {
     long dt;
     Image backGround; 
     ImageIcon gifIcon;
+    String selectedSong;
 
-    public Tab(Player player) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
-        this(player, 1);
-    }
 
-    public Tab(Player player, int playerNumber) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
+    public Tab(Player player, int playerNumber, String selectedSong, JFrame frame) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
         this.player = player;
         setLayout(null);
         setPreferredSize(new Dimension((int) (screenSize.getWidth()), (int) screenSize.getHeight()));
@@ -60,6 +61,7 @@ public class Tab extends JPanel {
         yellowNote.setBounds(xpos + 150, ypos, 50, 35);
         blueNote.setBounds(xpos + 225, ypos, 50, 35);
         orangeNote.setBounds(xpos + 300, ypos, 50, 35);
+        this.selectedSong = selectedSong;
 
         add(noteStreak);
         add(multiplier);
@@ -72,9 +74,10 @@ public class Tab extends JPanel {
         add(orangeNote);
         KB(playerNumber);
         setFocusable(true);
-        ng = new NoteGenerator("Note Generator",this);
+        ng = new NoteGenerator("Note Generator",this, selectedSong);
         notes = ng.getNotes();
         JLabel gifLabel;
+        this.frame = frame;
         
         /*try {
             backGround = ImageIO.read(new File("/C:/Users/Diego/Downloads/video.gif/"));
@@ -221,8 +224,7 @@ public class Tab extends JPanel {
     public void KB(int playerNumber) {
         KeyListener kb = new KeyListener() {
             @Override
-            public void keyTyped(KeyEvent e) {            
-            }
+            public void keyTyped(KeyEvent e) { }
 
             @Override
             public void keyPressed(KeyEvent e) {
@@ -307,10 +309,10 @@ public class Tab extends JPanel {
                         case KeyEvent.VK_L:
                             yellowNote.setReleased(false);
                             break;
-                        case KeyEvent.VK_DEAD_TILDE:
+                        case KeyEvent.VK_SEMICOLON:
                             blueNote.setReleased(false);
                             break;
-                        case KeyEvent.VK_OPEN_BRACKET:
+                        case KeyEvent.VK_QUOTE:
                             orangeNote.setReleased(false);
                             break;
                     }
@@ -318,7 +320,70 @@ public class Tab extends JPanel {
             }
         };
         this.addKeyListener(kb);
+
+        ControllerManager controllers = new ControllerManager();
+        controllers.initSDLGamepad();
+
+        new Thread(() -> {
+            while (true) {
+                ControllerState currState = controllers.getState(0);
+                if (currState.isConnected) {
+                    if (playerNumber == 1) {
+                        handleControllerInput(currState, greenNote, redNote, yellowNote, blueNote, orangeNote);
+                        if (currState.startJustPressed) {
+                            togglePause();
+                        }
+                    } else if (playerNumber == 2) {
+                        handleControllerInput(currState, greenNote, redNote, yellowNote, blueNote, orangeNote);
+                        if (currState.startJustPressed) {
+                            togglePause();
+                        }
+                    }
+                }
+
+                try {
+                    Thread.sleep(50); // Sleep to avoid flooding the console
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
+
+    private void handleControllerInput(ControllerState currState, PlayerNote greenNote, PlayerNote redNote, PlayerNote yellowNote, PlayerNote blueNote, PlayerNote orangeNote) {
+        if (currState.a) {  // Green fret
+            greenNote.setReleased(true);
+        } else {
+            greenNote.setReleased(false);
+            greenNote.setClicked(true);
+        }
+        if (currState.b) {  // Red fret
+            redNote.setReleased(true);
+        } else {
+            redNote.setReleased(false);
+            redNote.setClicked(true);
+        }
+        if (currState.y) {  // Yellow fret
+            yellowNote.setReleased(true);
+        } else {
+            yellowNote.setReleased(false);
+            yellowNote.setClicked(true);
+        }
+        if (currState.x) {  // Blue fret
+            blueNote.setReleased(true);
+        } else {
+            blueNote.setReleased(false);
+            blueNote.setClicked(true);
+        }
+        if (currState.lb) {  // Orange fret
+            orangeNote.setReleased(true);
+        } else {
+            orangeNote.setReleased(false);
+            orangeNote.setClicked(true);
+        }
+    }
+
+
 
     public void play() {
         //ng.playAudio();
@@ -384,6 +449,23 @@ public class Tab extends JPanel {
             int menuHeight = 500;
             menu.setBounds(500, 50, menuWidth, menuHeight);
             this.add(menu);
+            menu.addEvent(index -> {
+                switch (index) {
+                    case 0:
+                        togglePause();
+                        break;
+                    case 1:
+
+                        break;
+                    case 2:
+                        frame.getContentPane().removeAll();
+                        GameMenu menu = new GameMenu(frame, (int) screenSize.getWidth(), (int) screenSize.getHeight());
+                        frame.getContentPane().add(menu);
+                        frame.revalidate();
+                        frame.repaint();
+                        break;
+                }
+            });
             menu.setVisible(true);
             menu.requestFocusInWindow();
         } else {

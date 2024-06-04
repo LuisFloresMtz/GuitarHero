@@ -9,14 +9,15 @@ import java.awt.*;
 import java.io.IOException;
 
 public class OnePlayerScene extends JPanel {
-    Player player1 = new Player();
+    Player player;
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
-    public OnePlayerScene() throws IOException, UnsupportedAudioFileException, LineUnavailableException {
+    public OnePlayerScene(JFrame frame, String selectedSong) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
+        this.player = new Player(selectedSong,frame);
         setLayout(new GridLayout(1, 1));
         setSize(new Dimension((int) screenSize.getWidth(), (int) screenSize.getHeight()));
-        add(player1.tab);
-        player1.tab.play();
+        add(player.tab);
+        player.tab.play();
     }
 
 }

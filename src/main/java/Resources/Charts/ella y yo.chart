@@ -1,4 +1,10 @@
-
+[Song]
+{
+  Name = "Ella y yo"
+  Artist = "Don Omar"
+  Difficulty = 0
+  Genre = "Reggaeton"
+}
 [ExpertSingle]
 {
   7680 = N 1 0

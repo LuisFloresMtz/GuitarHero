@@ -1,24 +1,14 @@
 package Scenes.Menu;
 
+import java.awt.*;
+
 public class PauseMenu extends Menu3D{
     public PauseMenu() {
         super();
+        setBackground(new Color(0, 0, 0, 0.5f));
         items.removeAll(items);
         addMenuItem("Resume");
         addMenuItem("Restart");
         addMenuItem("Exit");
-        addEvent(index -> {
-            switch (index) {
-                case 0:
-                    System.out.println("Resume");
-                    break;
-                case 1:
-                    System.out.println("Restart");
-                    break;
-                case 2:
-                    System.out.println("Exit");
-                    break;
-            }
-        });
     }
 }

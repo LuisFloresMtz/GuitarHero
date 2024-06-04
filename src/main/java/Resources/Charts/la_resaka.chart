@@ -1,4 +1,10 @@
-
+[Song]
+{
+  Name = "La resaka"
+  Artist = "Los Delinquentes"
+  Difficulty = 4
+  Genre = "Rock"
+}
 [ExpertSingle]
 {
   3240 = N 0 0

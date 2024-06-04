@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.image.ImageObserver;
 
 public class Main {
     public static void main(String[] args) throws Exception {
@@ -26,7 +27,7 @@ public class Main {
             }
         });
 
-        GameMenu menu = new GameMenu(game,game.getWidth(),game.getHeight());
+        GameMenu menu = new GameMenu(game,(int) screenSize.getWidth(),(int) screenSize.getHeight());
 
         game.getContentPane().add(menu);
         game.pack();

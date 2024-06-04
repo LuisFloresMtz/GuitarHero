@@ -1,4 +1,10 @@
-
+﻿[Song]
+{
+  Name = "Cult of Personality"
+  Artist = "Living Colour"
+  Difficulty = 4
+  Genre = "rock"
+}
 [ExpertSingle]
 {
   3840 = N 0 0

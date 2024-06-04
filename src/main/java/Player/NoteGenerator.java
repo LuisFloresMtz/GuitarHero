@@ -18,19 +18,21 @@ public class NoteGenerator extends Thread {
     long startTime;
     long pausePosition;
 
-    public NoteGenerator(String name, JPanel panel) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
+    public NoteGenerator(String name, JPanel panel, String selectedSong) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
         super(name);
+
         this.panel = panel;
         notes = new ArrayList<>();
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         ypos = (int) screenSize.getHeight() - 100;
         xpos = (int) (screenSize.getWidth() - 300) / 2;
-        //readChartFile("src/main/java/Resources/Charts/cult_of_personality.chart");
+        System.out.println(selectedSong);
+        //readChartFile("src/main/java/Resources/Charts/cult of personality.chart");
         //loadAudio("src/main/java/Resources/Songs/Cult of Personality.wav");
         //readChartFile("src/main/java/Resources/Charts/la_resaka.chart");
         //loadAudio("src/main/java/Resources/Songs/La resaka.wav");
-        readChartFile("src/main/java/Resources/Charts/ella_y_yo.chart");
-        loadAudio("src/main/java/Resources/Songs/Ella y yo.wav");
+        readChartFile("src/main/java/Resources/Charts/"+selectedSong+".chart");
+        loadAudio("src/main/java/Resources/Songs/"+selectedSong+".wav");
         //start();
     }
 
@@ -46,13 +48,12 @@ public class NoteGenerator extends Thread {
            while ((line = reader.readLine()) != null) {
             line = line.trim();
             if (line.equals("[ExpertSingle]")) {
-                inNotesSection = false;
-            } else if(line.startsWith("}") || line.startsWith("[")) {
-                inNotesSection = false;
-            } else if (line.startsWith("{")) {
                 inNotesSection = true;
+            } else if (line.startsWith("{") && inNotesSection){
                 continue;
-            } else if (inNotesSection && !line.isEmpty()) {
+            } else if(line.equals("}") && inNotesSection){
+                inNotesSection = false;
+            }else if (inNotesSection && !line.isEmpty()) {
                 processNoteLine(line);
             }
         }
@@ -61,9 +62,10 @@ public class NoteGenerator extends Thread {
 
     private void processNoteLine(String line) {
         String[] parts = line.split(" = ");
-        int time = (int)(Integer.parseInt(parts[0].trim()));
+        System.out.println(parts[0] + " " + parts[1]);
+        int time = (Integer.parseInt(parts[0].trim()));
         /* PARA LA RESAKA
-        
+
         if(time >= 0 && time < 3840) {
             time = (int)((time * 60) / (86.083 * .480));
         } else if(time >= 3840 && time < 4800) {
@@ -78,7 +80,7 @@ public class NoteGenerator extends Thread {
         System.out.println("BOTON: " + track);
         if (track >= 0 && track <= 4) {
             GameNote note = switch (track) {
-                case 0 -> new GameNote(xpos, new Color(54, 58, 59), new Color(8, 200, 3), time); 
+                case 0 -> new GameNote(xpos, new Color(54, 58, 59), new Color(8, 200, 3), time);
                 case 1 -> new GameNote(xpos + 75, new Color(54, 58, 59), new Color(163, 24, 24), time);
                 case 2 -> new GameNote(xpos + 150, new Color(54, 58, 59), new Color(254, 254, 53), time);
                 case 3 -> new GameNote(xpos + 225, new Color(54, 58, 59), new Color(63, 162, 211), time);

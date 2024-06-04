@@ -1,5 +1,8 @@
 package Scenes.Menu;
 
+import com.studiohartman.jamepad.ControllerManager;
+import com.studiohartman.jamepad.ControllerState;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -20,66 +23,82 @@ public class Menu3D extends JComponent {
     protected final List<Menu3dItem> items = new ArrayList<>();
     private final int left = 60;
     private int pressedIndex = 0;
+    private final int menuHeight = 50;
 
     public Menu3D() {
         setFocusable(true);
         SwingUtilities.invokeLater(this::requestFocusInWindow);
         init();
-        initAnimator();
 
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                switch (e.getKeyCode()) {
-                    case KeyEvent.VK_UP:
-                        if (pressedIndex > 0) {
-                            pressedIndex--;
-                            repaint();
-                        }
-                        break;
-                    case KeyEvent.VK_DOWN:
-                        if (pressedIndex < items.size() - 1) {
-                            pressedIndex++;
-                            repaint();
-                        }
-                        break;
-                    case KeyEvent.VK_ENTER:
-                        if (pressedIndex != -1) {
-                            items.get(pressedIndex).getAnimator().show();
-                            hideMenu(pressedIndex);
-                            runEvent();
-                        }
-                        break;
-                }
+                handleInput(e.getKeyCode());
             }
         });
-    }
 
+        // Initialize the ControllerManager for game controller support
+        ControllerManager controllers = new ControllerManager();
+        controllers.initSDLGamepad();
 
-    private void initAnimator() {
-        MouseAdapter mouse = new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                int index = getOverIndex(e.getPoint());
-                if (index != pressedIndex) {
-                    pressedIndex = index;
-                    if (pressedIndex != -1) {
-                        items.get(pressedIndex).getAnimator().show();
-                        hideMenu(pressedIndex);
-                        runEvent();
+        // Create a new thread to continuously check the state of the game controller
+        new Thread(() -> {
+            while (true) {
+                ControllerState currState = controllers.getState(0); // 0 is the index of the first controller
+
+                if (currState.isConnected) {
+                    if (currState.dpadUpJustPressed) {
+                        handleInput(KeyEvent.VK_UP);
+                    }
+                    if (currState.dpadDownJustPressed) {
+                        handleInput(KeyEvent.VK_DOWN);
+                    }
+                    if (currState.startJustPressed) {
+                        handleInput(KeyEvent.VK_ENTER);
+                    }
+                    if (currState.aJustPressed) {
+                        handleInput(KeyEvent.VK_ENTER);
                     }
                 }
+
+                try {
+                    Thread.sleep(50); // Sleep to avoid flooding the console
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
-        };
-        addMouseListener(mouse);
+        }).start();
     }
+
+    private void handleInput(int keyCode) {
+        switch (keyCode) {
+            case KeyEvent.VK_UP:
+                if (pressedIndex > 0) {
+                    pressedIndex--;
+                    repaint();
+                }
+                break;
+            case KeyEvent.VK_DOWN:
+                if (pressedIndex < items.size() - 1) {
+                    pressedIndex++;
+                    repaint();
+                }
+                break;
+            case KeyEvent.VK_ENTER:
+                if (pressedIndex != -1) {
+                    items.get(pressedIndex).getAnimator().show();
+                    hideMenu(pressedIndex);
+                    runEvent();
+
+                }
+                break;
+        }
+    }
+
+
 
     private void init() {
         setForeground(new Color(238, 238, 238));
-        addMenuItem("Un jugador");
-        addMenuItem("Dos jugadores");
-        addMenuItem("Editar");
-        addMenuItem("Cerrar");
     }
 
     public void addEvent(EventMenu event) {
@@ -93,7 +112,6 @@ public class Menu3D extends JComponent {
     }
 
     public void addMenuItem(String menu) {
-        int menuHeight = 50;
         int y = items.size() * menuHeight + left;
         int shadowSize = 15;
         items.add(new Menu3dItem(this, left, y, menuHeight, shadowSize, menu));
@@ -125,8 +143,8 @@ public class Menu3D extends JComponent {
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         for (int i = items.size() - 1; i >= 0; i--) {
             if (i == pressedIndex) {
-                    items.get(pressedIndex).getAnimator().show();
-                    hideMenu(pressedIndex);
+                items.get(pressedIndex).getAnimator().show();
+                hideMenu(pressedIndex);
             }
             float angle = 150f;
             items.get(i).render(g2, 360 - angle, left, this);
@@ -134,4 +152,17 @@ public class Menu3D extends JComponent {
         g2.dispose();
         super.paintComponent(g);
     }
+
+    public int getItemsSize() {
+        return items.size();
+    }
+
+    public int getMenuHeight() {
+        return menuHeight;
+    }
+    public int getPressedIndex() {
+        return pressedIndex;
+    }
+
+
 }
