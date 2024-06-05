@@ -9,9 +9,10 @@ import java.awt.RenderingHints;
 public class GameNote extends Note {
     private double x;
     private double y;
-    boolean added;
+    private boolean inScreen;
+    private boolean scored;
     private int time;
-    private static int speed = 1750;
+    private static double speed = 4;
 
     public GameNote(Color color, Color borderColor) {
         super(color, borderColor);
@@ -22,7 +23,8 @@ public class GameNote extends Note {
         this.x = (double)x;
         this.y = 0;
         this.time = time;
-        this.added = false;
+        this.inScreen = false;
+        this.scored = false;
     }
     
     public GameNote(Color color, int time) {
@@ -37,10 +39,8 @@ public class GameNote extends Note {
         super(color, color);
         this.x = x;
         this.y = y;
-        this.added = false;
-        this.time = time;
+        this.inScreen = false;
     }
-
 
     public int getX() {
         return (int)x;
@@ -60,27 +60,35 @@ public class GameNote extends Note {
     
     
     public void physics(double ypos, double dt) {
-        y += speed/1000f;
-        //y += ypos/dt;
-        //System.out.println(y);
+        y += speed ;
+        //y += (speed * (dt))/ypos;
     }
 
-    public boolean isAdded() {
-        return added;
+    public boolean isInScreen() {
+        return inScreen;
     }
 
-    public void setAdded(boolean added) {
-        this.added = added;
+    public void setInScreen(boolean added) {
+        this.inScreen = added;
     }
+
     public int getTime() {
         return time;
     }
 
-    public static void setSpeed(int speed) {
+    public void setScored(boolean scored) {
+        this.scored = scored;
+    }
+
+    public boolean isScored() {
+        return scored;
+    }
+
+    public static void setSpeed(double speed) {
         GameNote.speed = speed;
     }
 
-    public static int getSpeed() {
+    public static double getSpeed() {
         return speed;
     }
     
