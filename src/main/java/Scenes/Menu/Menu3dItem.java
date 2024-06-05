@@ -168,9 +168,12 @@ public class Menu3dItem {
         AffineTransform tran = g2.getTransform();
         tran.shear(0, Math.toRadians(angle));
         g2.setTransform(tran);
-        float yy = getLocationFont(text, g2);
-        g2.drawString(text, 10f, yy);
+        if (text != null) {
+            float yy = getLocationFont(text, g2);
+            g2.drawString(text, 10f, yy);
+        }
     }
+
 
     private float getLocationFont(String text, Graphics2D g2) {
         FontMetrics fm = g2.getFontMetrics();
