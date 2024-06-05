@@ -1,25 +1,21 @@
 package Player;
 
-import Connection.mysqlConnection;
 import Scenes.Menu.GameMenu;
 import Scenes.Menu.Menu3D;
 import Scenes.Menu.PauseMenu;
 import com.studiohartman.jamepad.ControllerManager;
 import com.studiohartman.jamepad.ControllerState;
 
-
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
-import java.io.File;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
-import javax.imageio.ImageIO;
 
 public class Tab extends JPanel {
 
@@ -28,7 +24,7 @@ public class Tab extends JPanel {
     Player player;
     Menu3D menu;
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-    int ypos = (int) screenSize.getHeight() - 100;
+    int ypos = (int) screenSize.getHeight() - 75;
     int xpos = (int) (screenSize.getWidth() - 300) / 2;
     private final JLabel noteStreak = new JLabel("Note Streak: 0");
     private final JLabel multiplier = new JLabel("Multiplier: 1x");
@@ -44,7 +40,7 @@ public class Tab extends JPanel {
     private boolean paused = false;
     long elapsedTime;
     long dt;
-    Image backGround; 
+    Image backGround;
     ImageIcon gifIcon;
     String selectedSong;
 
@@ -75,7 +71,7 @@ public class Tab extends JPanel {
         add(orangeNote);
         KB(playerNumber);
         setFocusable(true);
-        ng = new NoteGenerator("Note Generator",this, selectedSong);
+        ng = new NoteGenerator("Note Generator", this, selectedSong);
         notes = ng.getNotes();
         JLabel gifLabel;
         this.frame = frame;
@@ -158,7 +154,7 @@ public class Tab extends JPanel {
         Iterator<GameNote> iterator = notes.iterator();
         //Iterator<GameNote> iterator = notesInScreen.iterator();
         while (iterator.hasNext()) {
-        //for(GameNote element : notesInScreen) {
+            //for(GameNote element : notesInScreen) {
             GameNote element = iterator.next();
             /*if(elapsedTime >= element.getTime() - dt) {
                 if (!element.isAdded() /*&& (elapsedTime) >= (element.getTime())) {
@@ -170,52 +166,52 @@ public class Tab extends JPanel {
                     //System.out.println("TIEMPO DE APARICION DE NOTA: " + (element.getTime() - dt));
 
                 }*/
-                if(element.isInScreen()){
-                    //element.setBounds(element.getX(), element.getY(), 50, 50);
-                    g.setColor(element.getBorderColor());
-                    g.fillOval(element.getX(), element.getY(), 50, 35);
-                    //element.physics((double)ypos,(double)dt);
-                }
+            if (element.isInScreen()) {
+                //element.setBounds(element.getX(), element.getY(), 50, 50);
+                g.setColor(element.getBorderColor());
+                g.fillOval(element.getX(), element.getY(), 50, 35);
+                //element.physics((double)ypos,(double)dt);
+            }
             //}
             //synchronized (ng) {
-                //if (element.getY() >= 50) {
-                if (element.getY() >= ypos && element.getY() <= ypos + 100 && element.isInScreen()) {
-                 
-                    if ((greenNote.isReleased() && greenNote.isClicked() && element.getX() == xpos) ||
-                            (redNote.isReleased() && redNote.isClicked() && element.getX() == xpos + 75) ||
-                            (yellowNote.isReleased() && yellowNote.isClicked() && element.getX() == xpos + 150) ||
-                            (blueNote.isReleased() && blueNote.isClicked() && element.getX() == xpos + 225) ||
-                            (orangeNote.isReleased() && orangeNote.isClicked() && element.getX() == xpos + 300)) {
-                        if(element.getX() == xpos) greenNote.setClicked(false);
-                        if(element.getX() == xpos + 75) redNote.setClicked(false);
-                        if(element.getX() == xpos + 150) yellowNote.setClicked(false);
-                        if(element.getX() == xpos + 225) blueNote.setClicked(false);
-                        if(element.getX() == xpos + 300) orangeNote.setClicked(false);
-                        //iterator.remove();
-                        //remove(element);
-                        element.setInScreen(false);
-                        element.setScored(true);
-                        //notesInScreen.remove(element);
-                        //notes.remove(element);
-                        player.score += 50 * player.multiplier;
-                        player.noteStreak++;
-                        if (player.noteStreak % 10 == 0 && player.multiplier <= 4) {
-                            player.multiplier++;
-                        }
-                        if (player.life < 100) {
-                            player.life += 5;
-                        }
-                    }
-                } else if (element.getY() >= screenSize.height && !element.isScored() && element.isInScreen()) {
+            //if (element.getY() >= 50) {
+            if (element.getY() >= ypos && element.getY() <= ypos + 100 && element.isInScreen()) {
+
+                if ((greenNote.isReleased() && greenNote.isClicked() && element.getX() == xpos) ||
+                        (redNote.isReleased() && redNote.isClicked() && element.getX() == xpos + 75) ||
+                        (yellowNote.isReleased() && yellowNote.isClicked() && element.getX() == xpos + 150) ||
+                        (blueNote.isReleased() && blueNote.isClicked() && element.getX() == xpos + 225) ||
+                        (orangeNote.isReleased() && orangeNote.isClicked() && element.getX() == xpos + 300)) {
+                    if (element.getX() == xpos) greenNote.setClicked(false);
+                    if (element.getX() == xpos + 75) redNote.setClicked(false);
+                    if (element.getX() == xpos + 150) yellowNote.setClicked(false);
+                    if (element.getX() == xpos + 225) blueNote.setClicked(false);
+                    if (element.getX() == xpos + 300) orangeNote.setClicked(false);
+                    //iterator.remove();
+                    //remove(element);
                     element.setInScreen(false);
-                    player.resetNoteStreak();
-                    player.resetMultiplier();
-                    if (player.life == 0) {
-                        //System.exit(0);
-                    } else {
-                        player.life -= 5;
+                    element.setScored(true);
+                    //notesInScreen.remove(element);
+                    //notes.remove(element);
+                    player.score += 50 * player.multiplier;
+                    player.noteStreak++;
+                    if (player.noteStreak % 10 == 0 && player.multiplier <= 4) {
+                        player.multiplier++;
+                    }
+                    if (player.life < 100) {
+                        player.life += 5;
                     }
                 }
+            } else if (element.getY() >= screenSize.height && !element.isScored() && element.isInScreen()) {
+                element.setInScreen(false);
+                player.resetNoteStreak();
+                player.resetMultiplier();
+                if (player.life == 0) {
+                    //System.exit(0);
+                } else {
+                    player.life -= 5;
+                }
+            }
             //}
         }
     }
@@ -223,7 +219,8 @@ public class Tab extends JPanel {
     public void KB(int playerNumber) {
         KeyListener kb = new KeyListener() {
             @Override
-            public void keyTyped(KeyEvent e) { }
+            public void keyTyped(KeyEvent e) {
+            }
 
             @Override
             public void keyPressed(KeyEvent e) {
@@ -381,7 +378,6 @@ public class Tab extends JPanel {
             orangeNote.setClicked(true);
         }
     }
-
 
 
     public void play() {

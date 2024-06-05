@@ -30,7 +30,7 @@ public class NoteGenerator extends Thread {
         xpos = (int) (screenSize.getWidth() - 300) / 2;
         //readChartFile("src/main/java/Resources/Charts/cult_of_personality.chart");
         //loadAudio("src/main/java/Resources/Songs/Cult of Personality.wav");
-        //readChartFile("src/main/java/Resources/Charts/la_resaka.chart");
+        //readChartFile("src/main/java/Resources/Charts/la resaka.chart");
         //loadAudio("src/main/java/Resources/Songs/La resaka.wav");
         readChartFile("src/main/java/Resources/Charts/"+selectedSong+".chart");
         loadAudio("src/main/java/Resources/Songs/"+selectedSong+".wav");
