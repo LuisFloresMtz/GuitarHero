@@ -32,7 +32,6 @@ public class Main {
         game.pack();
         game.setLocationRelativeTo(null);
         game.setVisible(true);
-
     }
 }
 

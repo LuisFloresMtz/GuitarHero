@@ -20,6 +20,7 @@ public class NoteGenerator extends Thread {
     long elapsedTime;
     long dt;
     long pausePosition;
+    boolean quit;
 
     public NoteGenerator(String name, JPanel panel, String selectedSong) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
         super(name);
@@ -28,13 +29,9 @@ public class NoteGenerator extends Thread {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         ypos = (int) screenSize.getHeight() - 100;
         xpos = (int) (screenSize.getWidth() - 300) / 2;
-        //readChartFile("src/main/java/Resources/Charts/cult_of_personality.chart");
-        //loadAudio("src/main/java/Resources/Songs/Cult of Personality.wav");
-        //readChartFile("src/main/java/Resources/Charts/la resaka.chart");
-        //loadAudio("src/main/java/Resources/Songs/La resaka.wav");
         readChartFile("src/main/java/Resources/Charts/"+selectedSong+".chart");
         loadAudio("src/main/java/Resources/Songs/"+selectedSong+".wav");
-        //start();
+        quit = false;
     }
 
     public ArrayList<GameNote> getNotes() {
@@ -66,19 +63,19 @@ public class NoteGenerator extends Thread {
         int time = (int)(Integer.parseInt(parts[0].trim()));
         // PARA LA RESAKA
         
-        if(time >= 0 && time < 3840) {
+        /*if(time >= 0 && time < 3840) {
             time = (int)((time * 60) / (86.083 * .480));
         } else if(time >= 3840 && time < 4800) {
             time = (int)((time * 60) / (85.887 * .480));
         } else if(time >= 4800) {
             time = (int)((time * 60) / (86.000 * .480));
-        }
+        }*/
         //  PARA ELLA Y YO
-        //time = (int)((time * 60) / (176.000 * .480));
+        
 
         System.out.println("TIEMPO: " + time);
-        String[] noteParts = parts[1].split(" ");
-        int track = Integer.parseInt(noteParts[1].trim());
+        String noteParts = parts[1];
+        int track = Integer.parseInt(noteParts.trim());
         System.out.println("BOTON: " + track);
         if (track >= 0 && track <= 4) {
             GameNote note = switch (track) {
@@ -124,17 +121,12 @@ public class NoteGenerator extends Thread {
 
     @Override
     public void run() {
-        dt = (long)(((ypos + 15)-GameNote.getSpeed()*GameNote.getSpeed()*10)/(GameNote.getSpeed())* 10) ;
         playAudio();
-        long t1 = startTime;
-        //System.out.println(t1);
+        dt = (long)(((ypos)-GameNote.getSpeed()*10)/(GameNote.getSpeed())* 10) ;
         System.out.println("dt: " + dt);
-            while(true) {
+            while(!quit) {
                 long loopStartTime = System.nanoTime();
                 elapsedTime = (System.nanoTime() - startTime)/1000000;
-                //long et2 =  (System.nanoTime() - t1);
-                //System.out.println(et2);
-                //if(et2 >= 1000000000) {
                 for (GameNote element : notes) {
                     if(!element.isInScreen()) {
                         if((elapsedTime >= element.getTime() - dt)){
@@ -146,10 +138,6 @@ public class NoteGenerator extends Thread {
                     }
 
                 }
-                //t1 = et2;
-                    //System.out.println("EN BLOQUE");
-                //}
-
                 try {
                     long loopEndTime = System.nanoTime(); // Marca de tiempo al final del loop
                     long loopDuration = loopEndTime - loopStartTime;
