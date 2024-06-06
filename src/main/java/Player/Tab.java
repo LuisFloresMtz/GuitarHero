@@ -112,11 +112,11 @@ public class Tab extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        Graphics2D g2d = (Graphics2D) g.create();
+        /*Graphics2D g2d = (Graphics2D) g.create();
         g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.8f));
         Image gifImage = gifIcon.getImage();
         g2d.drawImage(gifImage, 0, 0, getWidth(), getHeight(), this);
-        g2d.dispose();
+        g2d.dispose();*/
         //Image gifImage = gifIcon.getImage();
         //g.drawImage(gifImage, 0, 0, getWidth(), getHeight(), this);
         //g.drawImage(backGround,(int)50,170 - 100, 100, 100, this);
@@ -137,6 +137,8 @@ public class Tab extends JPanel {
     }
 
     private void drawLines(Graphics g, int xpos, int ypos) {
+        g.setColor(Color.DARK_GRAY);
+        g.fillRect(0, 0, getWidth(), getHeight());
         g.setColor(Color.BLACK);
         g.drawLine(xpos - 25, 0, xpos - 25, ypos + 75);
         g.drawLine(xpos + 25, 0, xpos + 25, ypos);
@@ -235,10 +237,10 @@ public class Tab extends JPanel {
                         case KeyEvent.VK_D:
                             yellowNote.setReleased(true);
                             break;
-                        case KeyEvent.VK_F:
+                        case KeyEvent.VK_G:
                             blueNote.setReleased(true);
                             break;
-                        case KeyEvent.VK_G:
+                        case KeyEvent.VK_H:
                             orangeNote.setReleased(true);
                             break;
                         case KeyEvent.VK_ESCAPE:
@@ -285,11 +287,11 @@ public class Tab extends JPanel {
                             yellowNote.setReleased(false);
                             yellowNote.setClicked(true);
                             break;
-                        case KeyEvent.VK_F:
+                        case KeyEvent.VK_G:
                             blueNote.setReleased(false);
                             blueNote.setClicked(true);
                             break;
-                        case KeyEvent.VK_G:
+                        case KeyEvent.VK_H:
                             orangeNote.setReleased(false);
                             orangeNote.setClicked(true);
                             break;
@@ -386,15 +388,15 @@ public class Tab extends JPanel {
                 if (!paused) {
                     draw();
                     try {
-                        TimeUnit.NANOSECONDS.sleep(1000);
+                        TimeUnit.NANOSECONDS.sleep(100000);
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
                 }
             }
         });
-        ng.start();
         gameThread.start();
+        ng.start();
         SwingUtilities.invokeLater(this::requestFocusInWindow);
     }
 

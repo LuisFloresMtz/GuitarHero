@@ -12,7 +12,7 @@ public class GameNote extends Note {
     private boolean inScreen;
     private boolean scored;
     private int time;
-    private static double speed = 4;
+    private static double speed = 6;
 
     public GameNote(Color color, Color borderColor) {
         super(color, borderColor);
