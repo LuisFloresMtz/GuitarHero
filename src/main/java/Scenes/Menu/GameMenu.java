@@ -1,9 +1,12 @@
 package Scenes.Menu;
 
-import Player.*;
+import Player.Editor;
+import Scenes.ControllerSelection;
 import Scenes.OnePlayerScene;
 import Scenes.SongList.SongList;
 import Utilities.Song;
+import com.studiohartman.jamepad.ControllerManager;
+import com.studiohartman.jamepad.ControllerState;
 import jnafilechooser.api.JnaFileChooser;
 
 import javax.swing.*;
@@ -17,26 +20,26 @@ import java.util.ArrayList;
 public class GameMenu extends JPanel {
 
     JnaFileChooser fileChooser = new JnaFileChooser();
-    int panelWidth;
-    int panelHeight = 300;
-    int WIDTH;
-    int HEIGHT;
     String selectedSong;
+    ControllerManager controllers = new ControllerManager();
+
     public GameMenu(JFrame frame, int WIDTH, int HEIGHT) {
-        this.WIDTH = WIDTH;
-        this.HEIGHT = HEIGHT;
+        controllers.initSDLGamepad();
+
+        Menu3D menu = new Menu3D();
+
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setLayout(null);
         setBackground(new Color(43, 45, 48));
-        panelWidth = frame.getWidth() / 4;
 
-        Menu3D menu = new Menu3D();
         menu.addMenuItem("Un jugador");
         menu.addMenuItem("Dos jugadores");
         menu.addMenuItem("Editar");
         menu.addMenuItem("Cerrar");
-        int menuWidth = WIDTH / 3;
+
         int menuHeight = menu.getItemsSize() * menu.getMenuHeight() + 75;
+        int menuWidth = WIDTH / 3;
+
         menu.setBounds((WIDTH - menuWidth) / 2, (HEIGHT - menuHeight) / 2, menuWidth, menuHeight);
 
         menu.addEvent(index -> {
@@ -76,15 +79,15 @@ public class GameMenu extends JPanel {
                         }
                     }
                 }
-                SongList songList = new SongList(frame, songs, WIDTH, HEIGHT,1);
+                SongList songList = new SongList(frame, songs, getWidth(), getHeight(), 1);
                 frame.getContentPane().removeAll();
                 frame.add(songList);
                 frame.revalidate();
                 frame.repaint();
-                // Aquí movemos la obtención de la canción seleccionada
+
                 selectedSong = songList.getSelectedSong();
                 if (selectedSong != null) {
-                    OnePlayerScene onePlayerPanel = new OnePlayerScene(frame,selectedSong);
+                    OnePlayerScene onePlayerPanel = new OnePlayerScene(frame, selectedSong);
                     frame.getContentPane().removeAll();
                     frame.getContentPane().add(onePlayerPanel);
                     frame.revalidate();
@@ -97,37 +100,45 @@ public class GameMenu extends JPanel {
     }
 
     private void switchToTwoPlayerScene(JFrame frame) {
-        try {
-            ArrayList<Song> songs = new ArrayList<>();
+        ControllerSelection controllerSelection = new ControllerSelection(frame, getWidth(), getHeight());
 
-            File folder = new File("src/main/java/Resources/Charts/");
-            File[] listOfFiles = folder.listFiles();
+        ControllerState currState = controllers.getState(0);
+        if (currState.isConnected) {
+            frame.getContentPane().removeAll();
+            frame.add(controllerSelection);
+            frame.revalidate();
+            frame.repaint();
+        } else {
+            try {
+                ArrayList<Song> songs = new ArrayList<>();
 
-            if (listOfFiles != null) {
-                System.out.println("Number of files: " + listOfFiles.length);
+                File folder = new File("src/main/java/Resources/Charts/");
+                File[] listOfFiles = folder.listFiles();
 
-                for (File file : listOfFiles) {
-                    if (file.isFile()) {
-                        try {
-                            Song song = readSongFromFile(file);
-                            songs.add(song);
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                if (listOfFiles != null) {
+                    System.out.println("Number of files: " + listOfFiles.length);
+
+                    for (File file : listOfFiles) {
+                        if (file.isFile()) {
+                            try {
+                                Song song = readSongFromFile(file);
+                                songs.add(song);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
-                }
 
-                // Aquí añadimos el SongList al content pane del frame
-                frame.getContentPane().removeAll();
-                frame.add(new SongList(frame, songs, WIDTH, HEIGHT,2));
-                frame.revalidate();
-                frame.repaint();
+                    frame.getContentPane().removeAll();
+                    frame.add(new SongList(frame, songs, getWidth(), getHeight(), 2));
+                    frame.revalidate();
+                    frame.repaint();
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
         }
     }
-
 
     private Song readSongFromFile(File file) throws IOException {
         Song song = new Song();
@@ -151,7 +162,7 @@ public class GameMenu extends JPanel {
 
     private void switchToEdit(JFrame frame) {
         fileChooser.setMultiSelectionEnabled(false);
-        fileChooser.setTitle("Selecciona una cancion");
+        fileChooser.setTitle("Selecciona una canción");
 
         if (fileChooser.showOpenDialog(null)) {
             File selectedFile = fileChooser.getSelectedFile();

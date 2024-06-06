@@ -20,7 +20,6 @@ import java.util.concurrent.TimeUnit;
 public class Tab extends JPanel {
 
     JFrame frame;
-    //mysqlConnection connection;
     Player player;
     Menu3D menu;
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -71,44 +70,15 @@ public class Tab extends JPanel {
         add(orangeNote);
         KB(playerNumber);
         setFocusable(true);
+        requestFocusInWindow();
         ng = new NoteGenerator("Note Generator", this, selectedSong);
         notes = ng.getNotes();
         JLabel gifLabel;
         this.frame = frame;
 
-        /*try {
-            backGround = ImageIO.read(new File("/C:/Users/Diego/Downloads/video.gif/"));
-        } catch (IOException e) {  
-            System.exit(1);
-        }
-        //notesInScreen = new CopyOnWriteArrayList<>();*/
         gifIcon = new ImageIcon("src/main/java/Resources/BackGrounds/Ella_y_yo.gif/");
-        /*gifLabel = new JLabel(gifIcon);
-        /*gifLabel.setBounds(0, 0, (int)screenSize.getWidth(), (int)screenSize.getHeight());
-        add(gifLabel);*/
     }
 
-    //Setters
-
-    public void setYpos(int ypos) {
-        this.ypos = ypos;
-    }
-
-    public void setXpos(int xpos) {
-        this.xpos = xpos;
-    }
-
-    //Getters
-
-    public int getYpos() {
-        return ypos;
-    }
-
-    public int getXpos() {
-        return xpos;
-    }
-
-    // Methods
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -117,13 +87,9 @@ public class Tab extends JPanel {
         Image gifImage = gifIcon.getImage();
         g2d.drawImage(gifImage, 0, 0, getWidth(), getHeight(), this);
         g2d.dispose();
-        //Image gifImage = gifIcon.getImage();
-        //g.drawImage(gifImage, 0, 0, getWidth(), getHeight(), this);
-        //g.drawImage(backGround,(int)50,170 - 100, 100, 100, this);
         if (!paused) {
             int oldNoteStreak = player.noteStreak;
             drawLines(g, xpos, ypos);
-            //g.fillRect(0, 0, screenSize.width, screenSize.height);
             if (!notes.isEmpty()) {
                 paintNotes(g);
             }
@@ -152,31 +118,13 @@ public class Tab extends JPanel {
 
     public void paintNotes(Graphics g) {
         Iterator<GameNote> iterator = notes.iterator();
-        //Iterator<GameNote> iterator = notesInScreen.iterator();
         while (iterator.hasNext()) {
-            //for(GameNote element : notesInScreen) {
             GameNote element = iterator.next();
-            /*if(elapsedTime >= element.getTime() - dt) {
-                if (!element.isAdded() /*&& (elapsedTime) >= (element.getTime())) {
-                    //element.setBounds(element.getX(), element.getY(), 50, 50);
-                    //add(element);
-                    element.setAdded(true);
-                    //g.fillOval(element.getX(), element.getY(), 50, 50);
-                    //System.out.println("TIEMPO TRANSCURRIDO: " + elapsedTime);
-                    //System.out.println("TIEMPO DE APARICION DE NOTA: " + (element.getTime() - dt));
-
-                }*/
             if (element.isInScreen()) {
-                //element.setBounds(element.getX(), element.getY(), 50, 50);
                 g.setColor(element.getBorderColor());
                 g.fillOval(element.getX(), element.getY(), 50, 35);
-                //element.physics((double)ypos,(double)dt);
             }
-            //}
-            //synchronized (ng) {
-            //if (element.getY() >= 50) {
             if (element.getY() >= ypos && element.getY() <= ypos + 100 && element.isInScreen()) {
-
                 if ((greenNote.isReleased() && greenNote.isClicked() && element.getX() == xpos) ||
                         (redNote.isReleased() && redNote.isClicked() && element.getX() == xpos + 75) ||
                         (yellowNote.isReleased() && yellowNote.isClicked() && element.getX() == xpos + 150) ||
@@ -187,12 +135,8 @@ public class Tab extends JPanel {
                     if (element.getX() == xpos + 150) yellowNote.setClicked(false);
                     if (element.getX() == xpos + 225) blueNote.setClicked(false);
                     if (element.getX() == xpos + 300) orangeNote.setClicked(false);
-                    //iterator.remove();
-                    //remove(element);
                     element.setInScreen(false);
                     element.setScored(true);
-                    //notesInScreen.remove(element);
-                    //notes.remove(element);
                     player.score += 50 * player.multiplier;
                     player.noteStreak++;
                     if (player.noteStreak % 10 == 0 && player.multiplier <= 4) {
@@ -212,7 +156,6 @@ public class Tab extends JPanel {
                     player.life -= 5;
                 }
             }
-            //}
         }
     }
 
@@ -316,6 +259,8 @@ public class Tab extends JPanel {
             }
         };
         this.addKeyListener(kb);
+        this.setFocusable(true);
+        this.requestFocusInWindow();
 
         ControllerManager controllers = new ControllerManager();
         controllers.initSDLGamepad();
@@ -379,7 +324,6 @@ public class Tab extends JPanel {
         }
     }
 
-
     public void play() {
         Thread gameThread = new Thread(() -> {
             while (true) {
@@ -417,7 +361,6 @@ public class Tab extends JPanel {
                         togglePause();
                         break;
                     case 1:
-
                         break;
                     case 2:
                         frame.getContentPane().removeAll();
@@ -438,5 +381,4 @@ public class Tab extends JPanel {
         this.revalidate();
         this.repaint();
     }
-
 }

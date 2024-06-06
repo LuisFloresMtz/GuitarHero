@@ -8,11 +8,10 @@ import java.awt.image.ImageObserver;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         JFrame game = new JFrame("Game");
         game.setUndecorated(true);
         game.setExtendedState(JFrame.MAXIMIZED_BOTH);
-
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         Image image = toolkit.createImage(new byte[0]);
         Cursor transparentCursor = toolkit.createCustomCursor(image, new Point(0, 0), "invisibleCursor");

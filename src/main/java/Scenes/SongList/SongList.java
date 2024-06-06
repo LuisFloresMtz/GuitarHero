@@ -9,21 +9,22 @@ import Utilities.Song;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+
 public class SongList extends JPanel {
     private String selectedSong;
-    private Menu3D menu;
-    Panel panel = new Panel();
+    private final Menu3D menu;
+    private final Panel panel = new Panel();
     private int players;
 
-    public SongList(JFrame frame, ArrayList<Song> songs, int WIDTH, int HEIGHT, int players){
+    public SongList(JFrame frame, ArrayList<Song> songs, int WIDTH, int HEIGHT, int players) {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         setBackground(new Color(43, 45, 48));
+
+        this.players = players;
 
         menu = new Menu3D();
         int menuWidth = (WIDTH / 6);
@@ -45,6 +46,10 @@ public class SongList extends JPanel {
             }
         });
 
+        // Asegurar que el menú tenga el foco para que el KeyListener funcione
+        menu.setFocusable(true);
+        menu.requestFocusInWindow();
+
         menu.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -52,16 +57,16 @@ public class SongList extends JPanel {
                     selectedSong = songs.get(menu.getPressedIndex()).getName();
                     frame.getContentPane().removeAll();
                     if (players == 1) {
-                        try{
-                            OnePlayerScene onePlayerScene = new OnePlayerScene(frame,selectedSong);
+                        try {
+                            OnePlayerScene onePlayerScene = new OnePlayerScene(frame, selectedSong);
                             frame.add(onePlayerScene);
                         } catch (Exception exception) {
                             exception.printStackTrace();
                         }
 
                     } else {
-                        try{
-                            TwoPlayerScene twoPlayerScene = new TwoPlayerScene(frame,selectedSong);
+                        try {
+                            TwoPlayerScene twoPlayerScene = new TwoPlayerScene(frame, selectedSong);
                             frame.add(twoPlayerScene);
                         } catch (Exception exception) {
                             exception.printStackTrace();
@@ -72,21 +77,19 @@ public class SongList extends JPanel {
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                     frame.getContentPane().removeAll();
                     GameMenu gameMenu = new GameMenu(frame, WIDTH, HEIGHT);
-                    frame.add(gameMenu);
+                    frame.getContentPane().add(gameMenu);
                     frame.revalidate();
                     frame.repaint();
-
                 }
             }
         });
     }
 
-
     public String getSelectedSong() {
         return selectedSong;
     }
 
-    public void updatePanel(String selectedSong){
+    public void updatePanel(String selectedSong) {
         panel.removeAll();
         panel.add(new JLabel(selectedSong));
         panel.revalidate();
