@@ -35,16 +35,13 @@ public class Server {
             out = new ObjectOutputStream(clientSocket.getOutputStream());
             in = new ObjectInputStream(clientSocket.getInputStream());
 
-            // Leer el mensaje de confirmación de conexión del cliente
             String message = (String) in.readObject();
             if ("CONNECTION_OK".equals(message)) {
                 System.out.println("Conexión confirmada por el cliente");
 
-                // Enviar mensaje de regreso al cliente
                 out.writeObject("Conexión establecida exitosamente");
                 out.flush();
 
-                // Abrir TwoPlayerScene
                 SwingUtilities.invokeLater(() -> {
                     try {
                         ArrayList<Song> songs = new ArrayList<>();
@@ -82,10 +79,8 @@ public class Server {
                             byte[] imageBytes = captureFrame(frame);
                             out.writeObject(imageBytes);
                             out.flush();
-                            System.out.println("Imagen enviada"); // Para depuración
-                            Thread.sleep(1000); // Captura y envía la imagen cada segundo
                         }
-                    } catch (IOException | AWTException | InterruptedException e) {
+                    } catch (IOException | AWTException e) {
                         e.printStackTrace();
                     }
                 }).start();
