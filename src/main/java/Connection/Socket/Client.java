@@ -93,8 +93,8 @@ public class Client extends JPanel {
 
     public void handleServer(JFrame frame) {
         try {
-            Server server = new Server(frame);
             JOptionPane.showMessageDialog(null, "Esperando al cliente...\n Tu ip es: " + java.net.InetAddress.getLocalHost().getHostAddress());
+            Server server = new Server(frame);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -155,6 +155,7 @@ public class Client extends JPanel {
                         imageLabel.setIcon(icon);
                         frame.revalidate();
                         frame.repaint();
+                        System.out.println("Imagen recibida"); // Para depuración
                     } catch (IOException | ClassNotFoundException e) {
                         e.printStackTrace();
                     }

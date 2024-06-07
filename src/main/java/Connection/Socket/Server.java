@@ -1,10 +1,13 @@
 package Connection.Socket;
 
+import Components.Scenes.TwoPlayerScene;
 import Components.SongList.SongList;
 import Utilities.Song;
 import com.studiohartman.jamepad.ControllerManager;
 
 import javax.imageio.ImageIO;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -79,6 +82,7 @@ public class Server {
                             byte[] imageBytes = captureFrame(frame);
                             out.writeObject(imageBytes);
                             out.flush();
+                            System.out.println("Imagen enviada"); // Para depuración
                             Thread.sleep(1000); // Captura y envía la imagen cada segundo
                         }
                     } catch (IOException | AWTException | InterruptedException e) {
