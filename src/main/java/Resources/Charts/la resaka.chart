@@ -4,8 +4,9 @@
   Artist = "Los Delinquentes"
   Difficulty = 4
   Genre = "Cumbia"
+  Players = 1
 }
-[ExpertSingle]
+[Player]
 {
     4704 = 0
     4791 = 0

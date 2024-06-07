@@ -17,14 +17,16 @@ import java.util.ArrayList;
 public class SongList extends JPanel {
     private String selectedSong;
     private Menu3D menu;
+    private GameMenu gameMenu;
+    private JFrame frame;
     Panel panel = new Panel();
     private int players;
 
-    public SongList(JFrame frame, ArrayList<Song> songs, int WIDTH, int HEIGHT, int players){
+    public SongList(GameMenu gameMenu, JFrame frame, ArrayList<Song> songs, int WIDTH, int HEIGHT, int players){
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         setBackground(new Color(43, 45, 48));
-
+        
         menu = new Menu3D();
         int menuWidth = (WIDTH / 6);
         int menuHeight = songs.size() * menu.getMenuHeight() + 75;
@@ -44,7 +46,7 @@ public class SongList extends JPanel {
                 updatePanel(selectedSong);
             }
         });
-
+        
         menu.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -75,13 +77,15 @@ public class SongList extends JPanel {
                     frame.add(gameMenu);
                     frame.revalidate();
                     frame.repaint();
+                    //SwingUtilities.invokeLater(gameMenu::requestFocusInWindow);
+                    
 
                 }
             }
         });
     }
 
-
+  
     public String getSelectedSong() {
         return selectedSong;
     }

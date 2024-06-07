@@ -4,9 +4,10 @@
   Artist = "Los Plebes del Rancho"
   Difficulty = 0
   Genre = "Corrido"
+  Players = 1
 }
 
-[ExpertSingle]
+[Player]
 {
     3984 = 0
     3984 = 2

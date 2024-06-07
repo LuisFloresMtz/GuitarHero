@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 public class NoteGenerator extends Thread {
     final ArrayList<GameNote> notes;
     JPanel panel;
+    Player player;
     int ypos;
     int xpos;
     Clip clip;
@@ -21,14 +22,16 @@ public class NoteGenerator extends Thread {
     long dt;
     long pausePosition;
     boolean quit;
-
-    public NoteGenerator(String name, JPanel panel, String selectedSong) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
+    public NoteGenerator(String name, JPanel panel, String selectedSong, Player player, int x, int y) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
         super(name);
         this.panel = panel;
+        this.player = player;
         notes = new ArrayList<>();
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        ypos = (int) screenSize.getHeight() - 100;
-        xpos = (int) (screenSize.getWidth() - 300) / 2;
+        ypos = y;
+        xpos = x;
+        System.out.println(ypos);
+        System.out.println(xpos);
         readChartFile("src/main/java/Resources/Charts/"+selectedSong+".chart");
         loadAudio("src/main/java/Resources/Songs/"+selectedSong+".wav");
         quit = false;
@@ -37,17 +40,23 @@ public class NoteGenerator extends Thread {
     public ArrayList<GameNote> getNotes() {
         return notes;
     }
-
+    
     public void readChartFile(String filePath) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(filePath));
         String line;
         boolean inNotesSection = false;
+        boolean twoPlayers = false;
 
            while ((line = reader.readLine()) != null) {
             line = line.trim();
-            if (line.equals("[ExpertSingle]")) {
+               //System.out.println(line);
+            if(line.equals("Players = 2"))
+                twoPlayers = true;
+            if ((!twoPlayers && line.equals("[Player]")) || (player.playerNumber == 1 && line.equals("[Player]"))) {
                 inNotesSection = true;
-            } else if (line.startsWith("{") && inNotesSection){
+            } else if(twoPlayers && player.playerNumber == 2 && line.equals("[Player2]")) {
+                inNotesSection = true;
+            }else if (line.startsWith("{") && inNotesSection){
                 continue;
             } else if(line.equals("}") && inNotesSection){
                 inNotesSection = false;
@@ -61,22 +70,8 @@ public class NoteGenerator extends Thread {
     private void processNoteLine(String line) {
         String[] parts = line.split(" = ");
         int time = (int)(Integer.parseInt(parts[0].trim()));
-        // PARA LA RESAKA
-        
-        /*if(time >= 0 && time < 3840) {
-            time = (int)((time * 60) / (86.083 * .480));
-        } else if(time >= 3840 && time < 4800) {
-            time = (int)((time * 60) / (85.887 * .480));
-        } else if(time >= 4800) {
-            time = (int)((time * 60) / (86.000 * .480));
-        }*/
-        //  PARA ELLA Y YO
-        
-
-        System.out.println("TIEMPO: " + time);
         String noteParts = parts[1];
         int track = Integer.parseInt(noteParts.trim());
-        System.out.println("BOTON: " + track);
         if (track >= 0 && track <= 4) {
             GameNote note = switch (track) {
                 case 0 -> new GameNote(xpos, new Color(54, 58, 59), new Color(8, 200, 3), time); 
@@ -88,8 +83,8 @@ public class NoteGenerator extends Thread {
             };
             if (note != null) {
                 notes.add(note);
-                note.setBounds(note.getX(), note.getY(), 50, 50);
-                System.out.println("Nota añadida");
+                //note.setBounds(note.getX(), note.getY(), 50, 50);
+                //System.out.println("Nota añadida");
             }
         }
     }
@@ -103,7 +98,7 @@ public class NoteGenerator extends Thread {
 
     public void playAudio() {
         clip.start();
-        startTime = System.nanoTime();
+        //startTime = System.nanoTime();
         System.out.println("TIEMPO INICIAL: " + startTime);
     }
 
@@ -121,8 +116,15 @@ public class NoteGenerator extends Thread {
 
     @Override
     public void run() {
-        playAudio();
-        dt = (long)(((ypos)-GameNote.getSpeed()*10)/(GameNote.getSpeed())* 10) ;
+        //playAudio();
+        dt = (long)(((ypos))/(GameNote.getSpeed())* 5) ;
+        try {
+            //TimeUnit.NANOSECONDS.sleep(100000000);
+            sleep((long) GameNote.getSpeed() * 100);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        startTime = System.nanoTime();
         System.out.println("dt: " + dt);
             while(!quit) {
                 long loopStartTime = System.nanoTime();
@@ -141,7 +143,7 @@ public class NoteGenerator extends Thread {
                 try {
                     long loopEndTime = System.nanoTime(); // Marca de tiempo al final del loop
                     long loopDuration = loopEndTime - loopStartTime;
-                    long sleepTime = 10000000 - loopDuration; // 10 ms en nanosegundos menos la duración del loop
+                    long sleepTime = 5000000 - loopDuration; // 5 ms en nanosegundos menos la duración del loop
                 if (sleepTime > 0) {
                     TimeUnit.NANOSECONDS.sleep(sleepTime);
                 }
