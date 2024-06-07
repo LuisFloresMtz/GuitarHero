@@ -111,15 +111,10 @@ public class Client extends JPanel {
                 in = new ObjectInputStream(socket.getInputStream());
                 JOptionPane.showMessageDialog(null, "Conectado al servidor");
 
-                // Enviar un mensaje de confirmación de conexión al servidor
                 out.writeObject("CONNECTION_OK");
                 out.flush();
+                
 
-                // Leer el mensaje de respuesta del servidor y mostrarlo en un JOptionPane
-                String response = (String) in.readObject();
-                JOptionPane.showMessageDialog(null, response);
-
-                // Manejar la captura de pantalla
                 handleScreenCapture(frame);
 
             } catch (Exception e) {
@@ -158,7 +153,7 @@ public class Client extends JPanel {
                                 frame.revalidate();
                                 frame.repaint();
                             });
-                            System.out.println("Imagen recibida"); // Para depuración
+                            System.out.println("Imagen recibida");
                         }
                     } catch (IOException | ClassNotFoundException e) {
                         e.printStackTrace();

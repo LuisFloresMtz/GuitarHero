@@ -1,16 +1,15 @@
 package Scenes.SongList;
 
-import Scenes.Menu.EventMenu;
-import Scenes.Menu.GameMenu;
-import Scenes.Menu.Menu3D;
+import Components.Menu.EventMenu;
+import Components.Menu.GameMenu;
+import Components.Menu.Menu3D;
 import Scenes.OnePlayerScene;
 import Scenes.TwoPlayerScene;
 import Utilities.Song;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;

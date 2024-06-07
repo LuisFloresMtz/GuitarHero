@@ -280,10 +280,10 @@ public class Tab extends JPanel {
                         case KeyEvent.VK_D:
                             player.yellowNote.setReleased(true);
                             break;
-                        case KeyEvent.VK_G:
+                        case KeyEvent.VK_F:
                             player.blueNote.setReleased(true);
                             break;
-                        case KeyEvent.VK_H:
+                        case KeyEvent.VK_G:
                             player.orangeNote.setReleased(true);
                             break;
                         case KeyEvent.VK_ESCAPE:
@@ -293,19 +293,19 @@ public class Tab extends JPanel {
                 //} else if (playerNumber == 2) {
                 if(multiplayer) {
                     switch (e.getKeyCode()) {
-                        case KeyEvent.VK_I:
+                        case KeyEvent.VK_Y:
                             player2.greenNote.setReleased(true);
                             break;
-                        case KeyEvent.VK_O:
+                        case KeyEvent.VK_U:
                             player2.redNote.setReleased(true);
                             break;
-                        case KeyEvent.VK_P:
+                        case KeyEvent.VK_I:
                             player2.yellowNote.setReleased(true);
                             break;
-                        case KeyEvent.VK_NUMPAD7:
+                        case KeyEvent.VK_O:
                             player2.blueNote.setReleased(true);
                             break;
-                        case KeyEvent.VK_NUMPAD8:
+                        case KeyEvent.VK_P:
                             player2.orangeNote.setReleased(true);
                             break;
                     }
@@ -338,23 +338,23 @@ public class Tab extends JPanel {
                     }
                 if(multiplayer) {
                     switch (e.getKeyCode()) {
-                        case KeyEvent.VK_I:
+                        case KeyEvent.VK_Y:
                             player2.greenNote.setReleased(false);
                             player2.greenNote.setClicked(true);
                             break;
-                        case KeyEvent.VK_O:
+                        case KeyEvent.VK_U:
                             player2.redNote.setReleased(false);
                             player2.redNote.setClicked(true);
                             break;
-                        case KeyEvent.VK_P:
+                        case KeyEvent.VK_I:
                             player2.yellowNote.setReleased(false);
                             player2.yellowNote.setClicked(true);
                             break;
-                        case KeyEvent.VK_NUMPAD7:
+                        case KeyEvent.VK_O:
                             player2.blueNote.setReleased(false);
                             player2.blueNote.setClicked(true);
                             break;
-                        case KeyEvent.VK_NUMPAD8:
+                        case KeyEvent.VK_P:
                             player2.orangeNote.setReleased(false);
                             player2.orangeNote.setClicked(true);
                             break;

@@ -2,8 +2,8 @@ package Components.SongList;
 
 import Components.Menu.GameMenu;
 import Components.Menu.Menu3D;
-import Components.Scenes.OnePlayerScene;
-import Components.Scenes.TwoPlayerScene;
+import Components.Scenes.*;
+import Scenes.OnePlayerScene;
 import Utilities.Song;
 import com.studiohartman.jamepad.ControllerManager;
 import com.studiohartman.jamepad.ControllerState;

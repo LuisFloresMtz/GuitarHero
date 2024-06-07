@@ -1,7 +1,9 @@
 
 package Player;
 
-import Scenes.Menu.Menu3D;
+
+import Components.Menu.Menu3D;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;

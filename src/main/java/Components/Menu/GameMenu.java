@@ -3,7 +3,7 @@ package Components.Menu;
 import Connection.Socket.Client;
 import Player.Editor;
 import Components.Scenes.ControllerSelection;
-import Components.Scenes.OnePlayerScene;
+
 import Components.SongList.SongList;
 import Utilities.Song;
 import com.studiohartman.jamepad.ControllerManager;
@@ -28,6 +28,7 @@ public class GameMenu extends JPanel {
     String selectedSong;
     Menu3D menu;
     ControllerManager controllers = new ControllerManager();
+    ArrayList<Song> songs = new ArrayList<>();
 
     public GameMenu(JFrame frame, int WIDTH, int HEIGHT) {
 
@@ -96,7 +97,6 @@ public class GameMenu extends JPanel {
                 }
 
                 SongList songList = new SongList(frame, songs, getWidth(), getHeight(), 1, controllers);
-                SongList songList = new SongList(this, frame, songs, WIDTH, HEIGHT,1);
                 frame.getContentPane().removeAll();
                 frame.add(songList);
                 frame.revalidate();
@@ -120,14 +120,7 @@ public class GameMenu extends JPanel {
         }
     }
 
-    private void switchToTwoPlayerScene(JFrame frame) {
-        try {
-            ArrayList<Song> songs = new ArrayList<>();
-            }
-         catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
+
 
     private void switchToTwoPlayerScene(JFrame frame) {
         ControllerSelection controllerSelection = new ControllerSelection(frame, getWidth(), getHeight());
@@ -140,7 +133,7 @@ public class GameMenu extends JPanel {
             frame.repaint();
         } else {
             try {
-                ArrayList<Song> songs = new ArrayList<>();
+               songs = new ArrayList<>();
 
                 File folder = new File("src/main/java/Resources/Charts/");
                 File[] listOfFiles = folder.listFiles();
@@ -161,7 +154,7 @@ public class GameMenu extends JPanel {
 
                 // Aquí añadimos el SongList al content pane del frame
                 frame.getContentPane().removeAll();
-                frame.add(new SongList(this, frame, songs, WIDTH, HEIGHT,2));
+                frame.add(new SongList(frame,songs,WIDTH,HEIGHT,2,controllers));
                 frame.revalidate();
                 frame.repaint();
 
