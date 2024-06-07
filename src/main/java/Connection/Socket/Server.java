@@ -79,11 +79,13 @@ public class Server {
                 new Thread(() -> {
                     try {
                         while (true) {
+                            long startTime = System.currentTimeMillis(); // Para medir el tiempo de captura y envío
                             byte[] imageBytes = captureFrame(frame);
                             out.writeObject(imageBytes);
                             out.flush();
-                            System.out.println("Imagen enviada"); // Para depuración
-                            Thread.sleep(1000); // Captura y envía la imagen cada segundo
+                            long endTime = System.currentTimeMillis(); // Para medir el tiempo de captura y envío
+                            System.out.println("Imagen enviada en " + (endTime - startTime) + " ms"); // Para depuración
+                            Thread.sleep(100); // Captura y envía la imagen cada 100 ms (0.1 segundo)
                         }
                     } catch (IOException | AWTException | InterruptedException e) {
                         e.printStackTrace();

@@ -93,7 +93,7 @@ public class Client extends JPanel {
 
     public void handleServer(JFrame frame) {
         try {
-            JOptionPane.showMessageDialog(null, "Tu ip es: " + java.net.InetAddress.getLocalHost().getHostAddress());
+            JOptionPane.showMessageDialog(null, "Esperando al cliente...\n Tu ip es: " + java.net.InetAddress.getLocalHost().getHostAddress());
             Server server = new Server(frame);
         } catch (Exception e) {
             e.printStackTrace();
