@@ -4,7 +4,6 @@ import Components.Menu.GameMenu;
 import Components.TextField.TextField;
 import Connection.Socket.Server;
 import Utilities.Button;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -154,10 +153,8 @@ public class Client extends JPanel {
                         Robot robot = new Robot();
                         robot.keyPress(keyCode);
                         robot.keyRelease(keyCode);
-                    } catch (IOException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
-                    } catch (AWTException e) {
-                        throw new RuntimeException(e);
                     }
                 }
             }).start();
