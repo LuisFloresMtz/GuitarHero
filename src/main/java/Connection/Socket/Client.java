@@ -110,6 +110,11 @@ public class Client extends JPanel {
                 out = new ObjectOutputStream(socket.getOutputStream());
                 in = new ObjectInputStream(socket.getInputStream());
                 JOptionPane.showMessageDialog(null, "Conectado al servidor");
+
+                // Enviar un mensaje de confirmación de conexión al servidor
+                out.writeObject("CONNECTION_OK");
+                out.flush();
+
                 handleScreenCapture(frame);
 
             } catch (Exception e) {
@@ -155,25 +160,19 @@ public class Client extends JPanel {
         imageLabel = new JLabel();
         add(imageLabel, BorderLayout.CENTER);
 
-        try {
-            socket = new Socket("localhost", 5000); // Cambia a la IP del servidor si es necesario
-            in = new ObjectInputStream(socket.getInputStream());
-
-            new Thread(() -> {
-                try {
-                    while (true) {
-                        byte[] imageBytes = (byte[]) in.readObject();
-                        BufferedImage img = ImageIO.read(new ByteArrayInputStream(imageBytes));
-                        ImageIcon icon = new ImageIcon(img);
-                        imageLabel.setIcon(icon);
-                        frame.revalidate();
-                        frame.repaint();
-                    }
-                } catch (IOException | ClassNotFoundException e) {
-                    e.printStackTrace();
+        new Thread(() -> {
+            try {
+                while (true) {
+                    byte[] imageBytes = (byte[]) in.readObject();
+                    BufferedImage img = ImageIO.read(new ByteArrayInputStream(imageBytes));
+                    ImageIcon icon = new ImageIcon(img);
+                    imageLabel.setIcon(icon);
+                    frame.revalidate();
+                    frame.repaint();
                 }
-            }).start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }}
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
 }
