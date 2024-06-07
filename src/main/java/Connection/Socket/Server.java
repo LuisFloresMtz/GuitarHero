@@ -79,7 +79,7 @@ public class Server {
                 new Thread(() -> {
                     try {
                         while (true) {
-                            byte[] imageBytes = captureScreen();
+                            byte[] imageBytes = captureFrame(frame);
                             out.writeObject(imageBytes);
                             out.flush();
                             Thread.sleep(1000); // Captura y envía la imagen cada segundo
@@ -96,20 +96,21 @@ public class Server {
         }
     }
 
-    private byte[] captureScreen() throws AWTException, IOException {
-        Robot robot = new Robot();
-        Rectangle screenRect = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
-        BufferedImage screenFullImage = robot.createScreenCapture(screenRect);
+    private byte[] captureFrame(JFrame frame) throws AWTException, IOException {
+        BufferedImage bufferedImage = new BufferedImage(frame.getWidth(), frame.getHeight(), BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = bufferedImage.createGraphics();
+        frame.paint(g2d);
+        g2d.dispose();
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(screenFullImage, "jpg", baos);
+        ImageIO.write(bufferedImage, "jpg", baos);
         baos.flush();
         byte[] imageInByte = baos.toByteArray();
         baos.close();
 
         return imageInByte;
-
     }
+
     private Song readSongFromFile(File file) throws IOException {
         Song song = new Song();
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {

@@ -149,11 +149,13 @@ public class Client extends JPanel {
             new Thread(() -> {
                 while (true) {
                     try {
-                        int keyCode = in.readInt();
-                        Robot robot = new Robot();
-                        robot.keyPress(keyCode);
-                        robot.keyRelease(keyCode);
-                    } catch (Exception e) {
+                        byte[] imageBytes = (byte[]) in.readObject();
+                        BufferedImage img = ImageIO.read(new ByteArrayInputStream(imageBytes));
+                        ImageIcon icon = new ImageIcon(img);
+                        imageLabel.setIcon(icon);
+                        frame.revalidate();
+                        frame.repaint();
+                    } catch (IOException | ClassNotFoundException e) {
                         e.printStackTrace();
                     }
                 }
@@ -163,7 +165,10 @@ public class Client extends JPanel {
 
     private void handleScreenCapture(JFrame frame) {
         imageLabel = new JLabel();
-        add(imageLabel, BorderLayout.CENTER);
+        frame.getContentPane().removeAll();
+        frame.getContentPane().add(imageLabel, BorderLayout.CENTER);
+        frame.revalidate();
+        frame.repaint();
 
         new Thread(() -> {
             try {
