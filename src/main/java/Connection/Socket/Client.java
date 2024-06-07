@@ -2,6 +2,7 @@ package Connection.Socket;
 
 import Components.Menu.GameMenu;
 import Components.TextField.TextField;
+import Connection.Socket.Server;
 import Utilities.Button;
 
 import javax.imageio.ImageIO;
@@ -119,6 +120,7 @@ public class Client extends JPanel {
                 String response = (String) in.readObject();
                 JOptionPane.showMessageDialog(null, response);
 
+                // Manejar la captura de pantalla
                 handleScreenCapture(frame);
 
             } catch (Exception e) {
@@ -152,8 +154,10 @@ public class Client extends JPanel {
                         Robot robot = new Robot();
                         robot.keyPress(keyCode);
                         robot.keyRelease(keyCode);
-                    } catch (Exception e) {
+                    } catch (IOException e) {
                         e.printStackTrace();
+                    } catch (AWTException e) {
+                        throw new RuntimeException(e);
                     }
                 }
             }).start();
@@ -164,26 +168,19 @@ public class Client extends JPanel {
         imageLabel = new JLabel();
         add(imageLabel, BorderLayout.CENTER);
 
-        try {
-            socket = new Socket("localhost", 5000); // Cambia a la IP del servidor si es necesario
-            in = new ObjectInputStream(socket.getInputStream());
-
-            new Thread(() -> {
-                try {
-                    while (true) {
-                        byte[] imageBytes = (byte[]) in.readObject();
-                        BufferedImage img = ImageIO.read(new ByteArrayInputStream(imageBytes));
-                        ImageIcon icon = new ImageIcon(img);
-                        imageLabel.setIcon(icon);
-                        frame.revalidate();
-                        frame.repaint();
-                    }
-                } catch (IOException | ClassNotFoundException e) {
-                    e.printStackTrace();
+        new Thread(() -> {
+            try {
+                while (true) {
+                    byte[] imageBytes = (byte[]) in.readObject();
+                    BufferedImage img = ImageIO.read(new ByteArrayInputStream(imageBytes));
+                    ImageIcon icon = new ImageIcon(img);
+                    imageLabel.setIcon(icon);
+                    frame.revalidate();
+                    frame.repaint();
                 }
-            }).start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 }

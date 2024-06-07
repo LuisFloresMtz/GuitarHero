@@ -1,6 +1,6 @@
 package Connection.Socket;
 
-import java.awt.*;
+import java.awt.AWTException;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -14,6 +14,7 @@ public class Server {
     public Server() {
         try {
             serverSocket = new ServerSocket(5000);
+            System.out.println("Esperando conexiones...");
             clientSocket = serverSocket.accept();
 
             out = new ObjectOutputStream(clientSocket.getOutputStream());
@@ -46,6 +47,5 @@ public class Server {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        new Server();
     }
 }
