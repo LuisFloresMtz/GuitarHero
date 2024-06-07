@@ -21,9 +21,18 @@ import java.util.ArrayList;
 public class GameMenu extends JPanel {
 
     JnaFileChooser fileChooser = new JnaFileChooser();
+    int panelWidth;
+    int panelHeight = 300;
+    int WIDTH;
+    int HEIGHT;
+    String selectedSong;
+    Menu3D menu;
     ControllerManager controllers = new ControllerManager();
 
     public GameMenu(JFrame frame, int WIDTH, int HEIGHT) {
+
+        this.WIDTH = WIDTH;
+        this.HEIGHT = HEIGHT;
         controllers.initSDLGamepad();
 
         Menu3D menu = new Menu3D();
@@ -32,6 +41,7 @@ public class GameMenu extends JPanel {
         setLayout(null);
         setBackground(new Color(43, 45, 48));
 
+        menu = new Menu3D();
         menu.addMenuItem("Un jugador");
         menu.addMenuItem("Dos jugadores");
         menu.addMenuItem("En linea");
@@ -64,6 +74,7 @@ public class GameMenu extends JPanel {
         });
 
         add(menu);
+
     }
 
     private void switchToOnePlayerScene(JFrame frame) {
@@ -85,12 +96,35 @@ public class GameMenu extends JPanel {
                 }
 
                 SongList songList = new SongList(frame, songs, getWidth(), getHeight(), 1, controllers);
+                SongList songList = new SongList(this, frame, songs, WIDTH, HEIGHT,1);
                 frame.getContentPane().removeAll();
                 frame.add(songList);
                 frame.revalidate();
                 frame.repaint();
+                //SwingUtilities.invokeLater(menu::requestFocusInWindow);
+                //SwingUtilities.invokeLater(this::requestFocusInWindow);
+                //this.repaint();
+                // Aquí movemos la obtención de la canción seleccionada
+                //selectedSong = songList.getSelectedSong();
+                /*if (selectedSong != null) {
+                    OnePlayerScene onePlayerPanel = new OnePlayerScene(frame,selectedSong);
+                    frame.getContentPane().removeAll();
+                    frame.getContentPane().add(onePlayerPanel);
+                    frame.revalidate();
+                    frame.repaint();
+                    System.out.println("sdjasijdisajdfsafasfasfasfasdas");
+                }*/
             }
         } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void switchToTwoPlayerScene(JFrame frame) {
+        try {
+            ArrayList<Song> songs = new ArrayList<>();
+            }
+         catch (Exception ex) {
             ex.printStackTrace();
         }
     }
@@ -125,16 +159,24 @@ public class GameMenu extends JPanel {
                         }
                     }
 
+                // Aquí añadimos el SongList al content pane del frame
+                frame.getContentPane().removeAll();
+                frame.add(new SongList(this, frame, songs, WIDTH, HEIGHT,2));
+                frame.revalidate();
+                frame.repaint();
+
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
                     frame.getContentPane().removeAll();
                     frame.add(new SongList(frame, songs, getWidth(), getHeight(), 2, controllers));
                     frame.revalidate();
                     frame.repaint();
                 }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+
         }
     }
+
 
     private Song readSongFromFile(File file) throws IOException {
         Song song = new Song();

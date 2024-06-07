@@ -4,8 +4,9 @@
   Artist = "Living Colour"
   Difficulty = 4
   Genre = "rock"
+  Players = 1
 }
-[ExpertSingle]
+[Player]
 {
     10175 = 0
     10340 = 3
