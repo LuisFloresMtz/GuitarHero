@@ -1,10 +1,9 @@
-import Scenes.Menu.GameMenu;
+import Components.Menu.GameMenu;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.image.ImageObserver;
 
 public class Main {
     public static void main(String[] args) throws Exception {

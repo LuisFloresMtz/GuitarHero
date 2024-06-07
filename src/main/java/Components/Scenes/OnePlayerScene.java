@@ -1,4 +1,4 @@
-package Scenes;
+package Components.Scenes;
 
 import Player.Player;
 
@@ -13,6 +13,7 @@ public class OnePlayerScene extends JPanel {
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
     public OnePlayerScene(JFrame frame, String selectedSong) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
+
         this.player = new Player(selectedSong,frame);
         setLayout(new GridLayout(1, 1));
         setSize(new Dimension((int) screenSize.getWidth(), (int) screenSize.getHeight()));

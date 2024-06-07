@@ -1,8 +1,8 @@
 package Player;
 
-import Scenes.Menu.GameMenu;
-import Scenes.Menu.Menu3D;
-import Scenes.Menu.PauseMenu;
+import Components.Menu.GameMenu;
+import Components.Menu.Menu3D;
+import Components.Menu.PauseMenu;
 import com.studiohartman.jamepad.ControllerManager;
 import com.studiohartman.jamepad.ControllerState;
 
@@ -237,10 +237,10 @@ public class Tab extends JPanel {
                         case KeyEvent.VK_D:
                             yellowNote.setReleased(true);
                             break;
-                        case KeyEvent.VK_G:
+                        case KeyEvent.VK_F:
                             blueNote.setReleased(true);
                             break;
-                        case KeyEvent.VK_H:
+                        case KeyEvent.VK_G:
                             orangeNote.setReleased(true);
                             break;
                         case KeyEvent.VK_ESCAPE:
@@ -287,11 +287,11 @@ public class Tab extends JPanel {
                             yellowNote.setReleased(false);
                             yellowNote.setClicked(true);
                             break;
-                        case KeyEvent.VK_G:
+                        case KeyEvent.VK_F:
                             blueNote.setReleased(false);
                             blueNote.setClicked(true);
                             break;
-                        case KeyEvent.VK_H:
+                        case KeyEvent.VK_G:
                             orangeNote.setReleased(false);
                             orangeNote.setClicked(true);
                             break;

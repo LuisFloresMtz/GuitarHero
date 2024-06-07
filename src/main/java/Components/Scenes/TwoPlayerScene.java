@@ -1,4 +1,4 @@
-package Scenes;
+package Components.Scenes;
 
 import Player.Player;
 

@@ -1,9 +1,10 @@
-package Scenes.Menu;
+package Components.Menu;
 
+import Connection.Socket.Client;
 import Player.Editor;
-import Scenes.ControllerSelection;
-import Scenes.OnePlayerScene;
-import Scenes.SongList.SongList;
+import Components.Scenes.ControllerSelection;
+import Components.Scenes.OnePlayerScene;
+import Components.SongList.SongList;
 import Utilities.Song;
 import com.studiohartman.jamepad.ControllerManager;
 import com.studiohartman.jamepad.ControllerState;
@@ -20,7 +21,6 @@ import java.util.ArrayList;
 public class GameMenu extends JPanel {
 
     JnaFileChooser fileChooser = new JnaFileChooser();
-    String selectedSong;
     ControllerManager controllers = new ControllerManager();
 
     public GameMenu(JFrame frame, int WIDTH, int HEIGHT) {
@@ -34,6 +34,7 @@ public class GameMenu extends JPanel {
 
         menu.addMenuItem("Un jugador");
         menu.addMenuItem("Dos jugadores");
+        menu.addMenuItem("En linea");
         menu.addMenuItem("Editar");
         menu.addMenuItem("Cerrar");
 
@@ -51,9 +52,12 @@ public class GameMenu extends JPanel {
                     switchToTwoPlayerScene(frame);
                     break;
                 case 2:
-                    switchToEdit(frame);
+                    switchToOnline(frame);
                     break;
                 case 3:
+                    switchToEdit(frame);
+                    break;
+                case 4:
                     System.exit(0);
                     break;
             }
@@ -79,20 +83,12 @@ public class GameMenu extends JPanel {
                         }
                     }
                 }
-                SongList songList = new SongList(frame, songs, getWidth(), getHeight(), 1);
+
+                SongList songList = new SongList(frame, songs, getWidth(), getHeight(), 1, controllers);
                 frame.getContentPane().removeAll();
                 frame.add(songList);
                 frame.revalidate();
                 frame.repaint();
-
-                selectedSong = songList.getSelectedSong();
-                if (selectedSong != null) {
-                    OnePlayerScene onePlayerPanel = new OnePlayerScene(frame, selectedSong);
-                    frame.getContentPane().removeAll();
-                    frame.getContentPane().add(onePlayerPanel);
-                    frame.revalidate();
-                    frame.repaint();
-                }
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -130,7 +126,7 @@ public class GameMenu extends JPanel {
                     }
 
                     frame.getContentPane().removeAll();
-                    frame.add(new SongList(frame, songs, getWidth(), getHeight(), 2));
+                    frame.add(new SongList(frame, songs, getWidth(), getHeight(), 2, controllers));
                     frame.revalidate();
                     frame.repaint();
                 }
@@ -149,11 +145,11 @@ public class GameMenu extends JPanel {
                 if (line.startsWith("Name = ")) {
                     song.setName(line.substring(8, line.length() - 1));
                 } else if (line.startsWith("Artist = ")) {
-                    song.setBand(line.substring(8, line.length() - 1));
+                    song.setBand(line.substring(10, line.length() - 1));
                 } else if (line.startsWith("Difficulty = ")) {
                     song.setDifficulty(Integer.parseInt(line.substring(13)));
                 } else if (line.startsWith("Genre = ")) {
-                    song.setGenre(line.substring(8, line.length() - 1));
+                    song.setGenre(line.substring(9, line.length() - 1));
                 }
             }
         }
@@ -186,5 +182,14 @@ public class GameMenu extends JPanel {
                 JOptionPane.showMessageDialog(null, "Please select a WAV file.", "Invalid File Type", JOptionPane.ERROR_MESSAGE);
             }
         }
+    }
+
+    public void switchToOnline(JFrame frame){
+
+                Client client = new Client(frame,getWidth(),getHeight());
+                frame.getContentPane().removeAll();
+                frame.add(client);
+                frame.revalidate();
+                frame.repaint();
     }
 }

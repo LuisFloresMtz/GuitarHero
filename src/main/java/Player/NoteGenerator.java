@@ -73,10 +73,8 @@ public class NoteGenerator extends Thread {
         //  PARA ELLA Y YO
         
 
-        System.out.println("TIEMPO: " + time);
         String noteParts = parts[1];
         int track = Integer.parseInt(noteParts.trim());
-        System.out.println("BOTON: " + track);
         if (track >= 0 && track <= 4) {
             GameNote note = switch (track) {
                 case 0 -> new GameNote(xpos, new Color(54, 58, 59), new Color(8, 200, 3), time); 
@@ -89,7 +87,6 @@ public class NoteGenerator extends Thread {
             if (note != null) {
                 notes.add(note);
                 note.setBounds(note.getX(), note.getY(), 50, 50);
-                System.out.println("Nota añadida");
             }
         }
     }
@@ -104,7 +101,6 @@ public class NoteGenerator extends Thread {
     public void playAudio() {
         clip.start();
         startTime = System.nanoTime();
-        System.out.println("TIEMPO INICIAL: " + startTime);
     }
 
     public void resumeAudio() {
@@ -123,7 +119,6 @@ public class NoteGenerator extends Thread {
     public void run() {
         playAudio();
         dt = (long)(((ypos)-GameNote.getSpeed()*10)/(GameNote.getSpeed())* 10) ;
-        System.out.println("dt: " + dt);
             while(!quit) {
                 long loopStartTime = System.nanoTime();
                 elapsedTime = (System.nanoTime() - startTime)/1000000;

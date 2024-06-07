@@ -1,4 +1,4 @@
-package Scenes.Menu;
+package Components.Menu;
 
 import java.awt.Component;
 import org.jdesktop.animation.timing.Animator;

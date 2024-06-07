@@ -1,6 +1,6 @@
-package Scenes;
+package Components.Scenes;
 
-import Scenes.SongList.SongList;
+import Components.SongList.SongList;
 import Utilities.Song;
 import com.studiohartman.jamepad.ControllerManager;
 import com.studiohartman.jamepad.ControllerState;
@@ -179,7 +179,7 @@ public class ControllerSelection extends JPanel {
                     }
 
                     frame.getContentPane().removeAll();
-                    frame.add(new SongList(frame, songs, getWidth(), getHeight(), 2));
+                    frame.add(new SongList(frame, songs, getWidth(), getHeight(), 2, controllers));
                     frame.revalidate();
                     frame.repaint();
                 }

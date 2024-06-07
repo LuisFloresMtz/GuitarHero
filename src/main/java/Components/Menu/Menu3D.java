@@ -1,4 +1,4 @@
-package Scenes.Menu;
+package Components.Menu;
 
 import com.studiohartman.jamepad.ControllerManager;
 import com.studiohartman.jamepad.ControllerState;
@@ -10,8 +10,6 @@ import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComponent;
@@ -37,11 +35,9 @@ public class Menu3D extends JComponent {
             }
         });
 
-        // Initialize the ControllerManager for game controller support
         ControllerManager controllers = new ControllerManager();
         controllers.initSDLGamepad();
 
-        // Create a new thread to continuously check the state of the game controller
         new Thread(() -> {
             while (true) {
                 ControllerState currState = controllers.getState(0); // 0 is the index of the first controller
@@ -60,7 +56,6 @@ public class Menu3D extends JComponent {
                         handleInput(KeyEvent.VK_ENTER);
                     }
                 }
-
                 try {
                     Thread.sleep(50); // Sleep to avoid flooding the console
                 } catch (InterruptedException e) {
@@ -70,7 +65,7 @@ public class Menu3D extends JComponent {
         }).start();
     }
 
-    private void handleInput(int keyCode) {
+    public void handleInput(int keyCode) {
         switch (keyCode) {
             case KeyEvent.VK_UP:
                 if (pressedIndex > 0) {

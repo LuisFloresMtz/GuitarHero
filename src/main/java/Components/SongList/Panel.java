@@ -1,4 +1,4 @@
-package Scenes.SongList;
+package Components.SongList;
 
 import Utilities.ShadowRenderer;
 
@@ -12,7 +12,7 @@ import java.awt.geom.Area;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import javax.swing.JComponent;
+import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 public class Panel extends JComponent {
@@ -70,6 +70,7 @@ public class Panel extends JComponent {
     private BufferedImage imageRender;
 
     public Panel() {
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBorder(new EmptyBorder(shadowSize, shadowSize, shadowSize, shadowSize));
         setBackground(new Color(20, 20, 20));
     }
@@ -90,8 +91,8 @@ public class Panel extends JComponent {
     }
 
     private void createImageRender() {
-        int width = getWidth();
-        int height = getHeight();
+        int width = getWidth()-100;
+        int height = getHeight()-100;
         if (width > 0 && height > 0) {
             Insets inset = getInsets();
             imageRender = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -105,7 +106,7 @@ public class Panel extends JComponent {
             g2.setColor(getBackground());
             g2.fill(area);
             area.subtract(new Area(new Rectangle2D.Double(width / 2, 0, width / 2, height)));
-            g2.setColor(backgroundLight);
+            g2.setColor(new Color(20, 20, 20));
             g2.fill(area);
             g2.drawImage(createBorder(width, height, inset), 0, 0, null);
             g2.dispose();

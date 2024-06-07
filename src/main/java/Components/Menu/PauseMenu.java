@@ -1,4 +1,4 @@
-package Scenes.Menu;
+package Components.Menu;
 
 import java.awt.*;
 
