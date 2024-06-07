@@ -1,6 +1,9 @@
 package Connection.Socket;
 
 import Components.Scenes.TwoPlayerScene;
+import Components.SongList.SongList;
+import Utilities.Song;
+import com.studiohartman.jamepad.ControllerManager;
 
 import javax.imageio.ImageIO;
 import javax.sound.sampled.LineUnavailableException;
@@ -11,6 +14,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class Server {
     ServerSocket serverSocket;
@@ -18,9 +22,10 @@ public class Server {
     ObjectOutputStream out;
     ObjectInputStream in;
     JFrame frame;
-    TwoPlayerScene twoPlayerScene;
+    private final ControllerManager controllers;
 
     public Server() {
+        controllers = new ControllerManager();
         try {
             serverSocket = new ServerSocket(5000);
             System.out.println("Esperando conexiones...");
@@ -41,14 +46,32 @@ public class Server {
                 // Abrir TwoPlayerScene
                 SwingUtilities.invokeLater(() -> {
                     try {
-                        frame = new JFrame("Two Player Scene");
-                        twoPlayerScene = new TwoPlayerScene(frame, "selectedSong"); // Reemplaza "selectedSong" por tu canción seleccionada
-                        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                        frame.add(twoPlayerScene);
-                        frame.pack();
-                        frame.setVisible(true);
-                    } catch (IOException | UnsupportedAudioFileException | LineUnavailableException e) {
-                        e.printStackTrace();
+                        ArrayList<Song> songs = new ArrayList<>();
+
+                        File folder = new File("src/main/java/Resources/Charts/");
+                        File[] listOfFiles = folder.listFiles();
+
+                        if (listOfFiles != null) {
+                            System.out.println("Number of files: " + listOfFiles.length);
+
+                            for (File file : listOfFiles) {
+                                if (file.isFile()) {
+                                    try {
+                                        Song song = readSongFromFile(file);
+                                        songs.add(song);
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+
+                            frame.getContentPane().removeAll();
+                            frame.add(new SongList(frame, songs, frame.getWidth(), frame.getHeight(), 2, controllers));
+                            frame.revalidate();
+                            frame.repaint();
+                        }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
                     }
                 });
 
@@ -84,5 +107,25 @@ public class Server {
         baos.close();
 
         return imageInByte;
+
+    }
+    private Song readSongFromFile(File file) throws IOException {
+        Song song = new Song();
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                if (line.startsWith("Name = ")) {
+                    song.setName(line.substring(8, line.length() - 1));
+                } else if (line.startsWith("Artist = ")) {
+                    song.setBand(line.substring(10, line.length() - 1));
+                } else if (line.startsWith("Difficulty = ")) {
+                    song.setDifficulty(Integer.parseInt(line.substring(13)));
+                } else if (line.startsWith("Genre = ")) {
+                    song.setGenre(line.substring(9, line.length() - 1));
+                }
+            }
+        }
+        return song;
     }
 }
