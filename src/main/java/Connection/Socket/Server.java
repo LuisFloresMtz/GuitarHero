@@ -1,5 +1,6 @@
 package Connection.Socket;
 
+import java.awt.*;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -13,7 +14,6 @@ public class Server {
     public Server() {
         try {
             serverSocket = new ServerSocket(5000);
-            System.out.println("Esperando conexiones...");
             clientSocket = serverSocket.accept();
 
             out = new ObjectOutputStream(clientSocket.getOutputStream());
@@ -27,6 +27,19 @@ public class Server {
                 // Enviar mensaje de regreso al cliente
                 out.writeObject("Conexión establecida exitosamente");
                 out.flush();
+
+                new Thread(() -> {
+                    try {
+                        while (true) {
+                            byte[] imageBytes = new ScreenCapture().captureScreen();
+                            out.writeObject(imageBytes);
+                            out.flush();
+                            Thread.sleep(1000); // Captura y envía la imagen cada segundo
+                        }
+                    } catch (IOException | AWTException | InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }).start();
             } else {
                 System.out.println("Conexión no confirmada");
             }
