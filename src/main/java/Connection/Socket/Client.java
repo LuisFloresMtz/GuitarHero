@@ -55,7 +55,7 @@ public class Client extends JPanel {
         lblServer.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                handleServer();
+                handleServer(frame);
             }
 
             @Override
@@ -91,10 +91,10 @@ public class Client extends JPanel {
         SwingUtilities.invokeLater(this::requestFocusInWindow);
     }
 
-    public void handleServer() {
+    public void handleServer(JFrame frame) {
         try {
             JOptionPane.showMessageDialog(null, "Esperando al cliente...\n Tu ip es: " + java.net.InetAddress.getLocalHost().getHostAddress());
-            Server server = new Server();
+            Server server = new Server(frame);
         } catch (Exception e) {
             e.printStackTrace();
         }

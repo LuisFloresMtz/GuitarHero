@@ -24,7 +24,8 @@ public class Server {
     JFrame frame;
     private final ControllerManager controllers;
 
-    public Server() {
+    public Server(JFrame frame) {
+        this.frame = frame;
         controllers = new ControllerManager();
         try {
             serverSocket = new ServerSocket(5000);
