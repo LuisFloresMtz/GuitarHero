@@ -2,8 +2,8 @@ package Connection.Socket;
 
 import Components.Menu.GameMenu;
 import Components.TextField.TextField;
-import Connection.Socket.Server;
 import Utilities.Button;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -93,7 +93,7 @@ public class Client extends JPanel {
 
     public void handleServer(JFrame frame) {
         try {
-            JOptionPane.showMessageDialog(null, "Esperando al cliente...\n Tu ip es: " + java.net.InetAddress.getLocalHost().getHostAddress());
+            JOptionPane.showMessageDialog(null, "Tu ip es: " + java.net.InetAddress.getLocalHost().getHostAddress());
             Server server = new Server(frame);
         } catch (Exception e) {
             e.printStackTrace();
@@ -150,12 +150,16 @@ public class Client extends JPanel {
                 while (true) {
                     try {
                         byte[] imageBytes = (byte[]) in.readObject();
-                        BufferedImage img = ImageIO.read(new ByteArrayInputStream(imageBytes));
-                        ImageIcon icon = new ImageIcon(img);
-                        imageLabel.setIcon(icon);
-                        frame.revalidate();
-                        frame.repaint();
-                        System.out.println("Imagen recibida"); // Para depuración
+                        if (imageBytes != null) {
+                            BufferedImage img = ImageIO.read(new ByteArrayInputStream(imageBytes));
+                            ImageIcon icon = new ImageIcon(img);
+                            SwingUtilities.invokeLater(() -> {
+                                imageLabel.setIcon(icon);
+                                frame.revalidate();
+                                frame.repaint();
+                            });
+                            System.out.println("Imagen recibida"); // Para depuración
+                        }
                     } catch (IOException | ClassNotFoundException e) {
                         e.printStackTrace();
                     }
@@ -170,20 +174,5 @@ public class Client extends JPanel {
         frame.getContentPane().add(imageLabel, BorderLayout.CENTER);
         frame.revalidate();
         frame.repaint();
-
-        new Thread(() -> {
-            try {
-                while (true) {
-                    byte[] imageBytes = (byte[]) in.readObject();
-                    BufferedImage img = ImageIO.read(new ByteArrayInputStream(imageBytes));
-                    ImageIcon icon = new ImageIcon(img);
-                    imageLabel.setIcon(icon);
-                    frame.revalidate();
-                    frame.repaint();
-                }
-            } catch (IOException | ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        }).start();
     }
 }
