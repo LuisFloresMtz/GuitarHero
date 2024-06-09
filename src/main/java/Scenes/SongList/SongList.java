@@ -1,5 +1,6 @@
 package Scenes.SongList;
 
+import Player.Tab;
 import Scenes.Menu.EventMenu;
 import Scenes.Menu.GameMenu;
 import Scenes.Menu.Menu3D;
@@ -23,10 +24,11 @@ public class SongList extends JPanel {
     private int players;
 
     public SongList(GameMenu gameMenu, JFrame frame, ArrayList<Song> songs, int WIDTH, int HEIGHT, int players){
+        System.out.println("SongList creado");
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         setBackground(new Color(43, 45, 48));
-        
+        this.frame = frame;
         menu = new Menu3D();
         int menuWidth = (WIDTH / 6);
         int menuHeight = songs.size() * menu.getMenuHeight() + 75;
@@ -55,31 +57,37 @@ public class SongList extends JPanel {
                     frame.getContentPane().removeAll();
                     if (players == 1) {
                         try{
-                            OnePlayerScene onePlayerScene = new OnePlayerScene(frame,selectedSong);
-                            frame.add(onePlayerScene);
+                            //if(onePlayerScene == null)
+                            OnePlayerScene onePlayerScene = new OnePlayerScene(gameMenu,frame,selectedSong);
+                            frame.getContentPane().removeAll();
+                            frame.getContentPane().add(onePlayerScene.getTab());
+                            frame.revalidate();
+                            frame.repaint();
+                            //onePlayerScene.getTab().setMultiplayer(false);
+                            onePlayerScene.getTab().play(selectedSong);
+                            
                         } catch (Exception exception) {
                             exception.printStackTrace();
                         }
 
                     } else {
                         try{
-                            TwoPlayerScene twoPlayerScene = new TwoPlayerScene(frame,selectedSong);
-                            frame.add(twoPlayerScene);
+                            TwoPlayerScene twoPlayerScene = new TwoPlayerScene(gameMenu,frame,selectedSong);
+                            frame.add(twoPlayerScene.getTab());
+                            frame.getContentPane().removeAll();
+                            frame.getContentPane().add(twoPlayerScene.getTab());
+                            frame.revalidate();
+                            frame.repaint();
+                            //twoPlayerScene.getTab().setMultiplayer(true);
+                            twoPlayerScene.getTab().play(selectedSong);
                         } catch (Exception exception) {
                             exception.printStackTrace();
                         }
                     }
-
                 }
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                    frame.getContentPane().removeAll();
-                    GameMenu gameMenu = new GameMenu(frame, WIDTH, HEIGHT);
-                    frame.add(gameMenu);
-                    frame.revalidate();
-                    frame.repaint();
-                    //SwingUtilities.invokeLater(gameMenu::requestFocusInWindow);
                     
-
+                    gameMenu.resetMenu(frame);
                 }
             }
         });
@@ -95,5 +103,13 @@ public class SongList extends JPanel {
         panel.add(new JLabel(selectedSong));
         panel.revalidate();
         panel.repaint();
+    }
+    
+    public void switchSongMenu() {
+        frame.getContentPane().removeAll();
+        frame.add(this);
+        frame.revalidate();
+        frame.repaint();
+        SwingUtilities.invokeLater(menu::requestFocusInWindow);
     }
 }

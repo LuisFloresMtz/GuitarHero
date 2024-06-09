@@ -42,7 +42,7 @@ public class Menu3D extends JComponent {
         controllers.initSDLGamepad();
 
         // Create a new thread to continuously check the state of the game controller
-        new Thread(() -> {
+        /*new Thread(() -> {
             while (true) {
                 ControllerState currState = controllers.getState(0); // 0 is the index of the first controller
 
@@ -67,7 +67,7 @@ public class Menu3D extends JComponent {
                     e.printStackTrace();
                 }
             }
-        }).start();
+        }).start();*/
     }
 
     private void handleInput(int keyCode) {

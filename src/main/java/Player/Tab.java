@@ -12,18 +12,26 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 
 public class Tab extends JPanel {
-
+    
     JFrame frame;
     //mysqlConnection connection;
     Player player;
     Player player2;
+    Clip clip;
     Menu3D menu;
+    GameMenu mainMenu;
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     int ypos;
     int xpos; 
@@ -42,73 +50,43 @@ public class Tab extends JPanel {
     ImageIcon gifIcon;
     String selectedSong;
     static boolean multiplayer;
+    boolean exit;
+    GameThread gameThread;
 
 
-    public Tab(Player player, Player player2, String selectedSong, JFrame frame) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
+    public Tab(GameMenu mainMenu, Player player, Player player2, String selectedSong, JFrame frame) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
+        System.out.println("TAB Creado");
+        setLayout(new GridLayout(1, 1));
+        setSize(new Dimension((int) screenSize.getWidth(), (int) screenSize.getHeight()));
         this.player = player;
+        this.player2 = player2;
+        this.mainMenu = mainMenu;
+        this.selectedSong = selectedSong;
+        this.exit = false;
         setLayout(null);
         setPreferredSize(new Dimension((int) (screenSize.getWidth()), (int) screenSize.getHeight()));
         ypos = (int) screenSize.getHeight() - 75;
         xpos = (int) (screenSize.getWidth() - 300) / 2;
-        if(multiplayer) {
-            this.player2 = player2;
+       
+        if(multiplayer){
             xpos /= 2;
-            player2.noteStreakLabel.setBounds(screenSize.width - 145, 15, 100, 15);
-            player2.noteStreakLabel.setForeground(Color.WHITE);
-            player2.multiplierLabel.setBounds(screenSize.width - 145, 30, 100, 15);
-            player2.multiplierLabel.setForeground(Color.WHITE);
-            player2.scoreLabel.setBounds(screenSize.width - 145, 45, 100, 15);
-            player2.scoreLabel.setForeground(Color.WHITE);
-            player2.lifeLabel.setBounds(screenSize.width - 145, 60, 100, 15);
-            player2.lifeLabel.setForeground(Color.WHITE);
-            player2.greenNote.setBounds(xpos * 3, ypos, 50, 35);
-            player2.redNote.setBounds(xpos * 3 + 75, ypos, 50, 35);
-            player2.yellowNote.setBounds(xpos * 3 + 150, ypos, 50, 35);
-            player2.blueNote.setBounds(xpos * 3 + 225, ypos, 50, 35);
-            player2.orangeNote.setBounds(xpos * 3 + 300, ypos, 50, 35);
-            add(player2.noteStreakLabel);
-            add(player2.multiplierLabel);
-            add(player2.scoreLabel);
-            add(player2.lifeLabel);
-            add(player2.greenNote);
-            add(player2.redNote);
-            add(player2.yellowNote);
-            add(player2.blueNote);
-            add(player2.orangeNote);
-            ng2 = new NoteGenerator("Note Generator", this, selectedSong, player2, xpos * 3, ypos);
-            notes2 = ng2.getNotes();
+            //this.player2 = new Player(2, selectedSong,frame/*,xpos * 3,ypos*/);
+            this.player2.setXpos(xpos * 3);
+            this.player2.setYpos(ypos);
+            this.player2.addComponents(this,screenSize.width - 145);
+            //ng2 = new NoteGenerator("Note Generator", this, selectedSong, player2, xpos * 3, ypos);
+            //notes2 = ng2.getNotes();
         }
-        player.noteStreakLabel.setBounds(70, 15, 100, 15);
-        player.noteStreakLabel.setForeground(Color.WHITE);
-        player.multiplierLabel.setBounds(70, 30, 100, 15);
-        player.multiplierLabel.setForeground(Color.WHITE);
-        player.scoreLabel.setBounds(70, 45, 100, 15);
-        player.scoreLabel.setForeground(Color.WHITE);
-        player.lifeLabel.setBounds(70, 60, 100, 15);
-        player.lifeLabel.setForeground(Color.WHITE);
-        player.greenNote.setBounds(xpos, ypos, 50, 35);
-        player.redNote.setBounds(xpos + 75, ypos, 50, 35);
-        player.yellowNote.setBounds(xpos + 150, ypos, 50, 35);
-        player.blueNote.setBounds(xpos + 225, ypos, 50, 35);
-        player.orangeNote.setBounds(xpos + 300, ypos, 50, 35);
-        this.selectedSong = selectedSong;
-
-        add(player.noteStreakLabel);
-        add(player.multiplierLabel);
-        add(player.scoreLabel);
-        add(player.lifeLabel);
-        add(player.greenNote);
-        add(player.redNote);
-        add(player.yellowNote);
-        add(player.blueNote);
-        add(player.orangeNote);
+        //this.player = new Player(1,selectedSong,frame/*,xpos,ypos*/);
+        this.player.setXpos(xpos);
+        this.player.setYpos(ypos);
+        this.player.addComponents(this,70);
+        //ng = new NoteGenerator("Note Generator", this, selectedSong, player, xpos, ypos);
+        //notes = ng.getNotes();
         KB();
         setFocusable(true);
-        ng = new NoteGenerator("Note Generator", this, selectedSong, player, xpos, ypos);
-        notes = ng.getNotes();
         JLabel gifLabel;
         this.frame = frame;
-
         /*try {
             backGround = ImageIO.read(new File("/C:/Users/Diego/Downloads/video.gif/"));
         } catch (IOException e) {  
@@ -149,6 +127,14 @@ public class Tab extends JPanel {
         return notes;
     }
 
+    public Dimension getScreenSize() {
+        return screenSize;
+    }
+
+    public static boolean isMultiplayer() {
+        return multiplayer;
+    }
+
     // Methods
     @Override
     protected void paintComponent(Graphics g) {
@@ -161,22 +147,15 @@ public class Tab extends JPanel {
         //Image gifImage = gifIcon.getImage();
         //g.drawImage(gifImage, 0, 0, getWidth(), getHeight(), this);
         //g.drawImage(backGround,(int)50,170 - 100, 100, 100, this);
-        if (!paused) {
+       
             //int oldNoteStreak = player.noteStreak;
-            drawLines(g, xpos, ypos);
-            if (!notes.isEmpty()) {
-                paintNotes(g,notes,player);
-            }
-            if(multiplayer) {
-                if(!notes2.isEmpty())
-                   paintNotes(g,notes2,player2); 
-            }
-            /*if (oldNoteStreak != player.noteStreak) {
-                noteStreak.setText("Note Streak: " + player.noteStreak);
-            }
-            score.setText("Score: " + player.score);
-            multiplier.setText("Multiplier: " + player.multiplier + "x");
-            life.setText("Life: " + player.life);*/
+        drawLines(g, xpos, ypos);
+        if (!notes.isEmpty()) {
+            paintNotes(g,notes,player);
+        }
+        if(multiplayer) {
+            if(!notes2.isEmpty())
+                paintNotes(g,notes2,player2); 
         }
     }
 
@@ -290,7 +269,6 @@ public class Tab extends JPanel {
                             togglePause();
                             break;
                     }
-                //} else if (playerNumber == 2) {
                 if(multiplayer) {
                     switch (e.getKeyCode()) {
                         case KeyEvent.VK_I:
@@ -364,7 +342,7 @@ public class Tab extends JPanel {
         };
         this.addKeyListener(kb);
 
-        ControllerManager controllers = new ControllerManager();
+        /*ControllerManager controllers = new ControllerManager();
         controllers.initSDLGamepad();
 
         new Thread(() -> {
@@ -390,7 +368,7 @@ public class Tab extends JPanel {
                     e.printStackTrace();
                 }
             }
-        }).start();
+        }).start();*/
     }
 
     private void handleControllerInput(ControllerState currState, PlayerNote greenNote, PlayerNote redNote, PlayerNote yellowNote, PlayerNote blueNote, PlayerNote orangeNote) {
@@ -427,68 +405,107 @@ public class Tab extends JPanel {
     }
 
 
-    public void play() {
-        //GameThread hilo = new GameThread(this);
-        //Thread gameThread = new Thread();
-        Thread gameThread = new Thread(() -> {
-            while (true) {
-                if (!paused) {
-                    draw();
-                    try {
-                        TimeUnit.NANOSECONDS.sleep(1000);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            }
-        });
-        
-        gameThread.start();
-        ng.playAudio();
+    public void play(String selectedSong) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
+        gameThread = new GameThread(this);
+        ng = new NoteGenerator("Note Generator", this, selectedSong, player, xpos, ypos);
+        notes = ng.getNotes();
+       
+        if(multiplayer){
+            ng2 = new NoteGenerator("Note Generator", this, selectedSong, player2, xpos * 3, ypos);
+            notes2 = ng2.getNotes();
+            ng2.start();
+        }
         ng.start();
-        if(multiplayer) ng2.start();
+        playAudio();
+        gameThread.start();
         SwingUtilities.invokeLater(this::requestFocusInWindow);
     }
 
     public void draw() {
         repaint();
     }
+    
+    public void playAudio() throws UnsupportedAudioFileException, LineUnavailableException, IOException {
+        String audioFilePath= "src/main/java/Resources/Songs/"+selectedSong+".wav";
+        File audioFile = new File(audioFilePath);
+        AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
+        clip = AudioSystem.getClip();
+        clip.open(audioStream);
+        clip.start();
+    }
+     public void resumeAudio() {
+        //clip.setMicrosecondPosition(pausePosition);
+        //startTime = System.nanoTime() - pausePosition;
+        clip.start();
+        //startTime = System.currentTimeMillis() - pausePosition / 1000;
+        //paused = false;
+    }
 
+    public void pauseAudio() {
+        //pausePosition = clip.getMicrosecondPosition();
+        //pausePosition = (long) (elapsedTime * 1000000f);
+        clip.stop();
+       // paused = true;
+        //wait();
+    }
     void togglePause() {
         paused = !paused;
         if (paused) {
-            ng.pauseAudio();
+            
+            ng.pauseG();
+            if(multiplayer)
+                ng2.pauseG();
+            pauseAudio();
+            //if(menu == null) 
             menu = new PauseMenu();
+            //menu.setVisible(true);
             int menuWidth = 600;
             int menuHeight = 500;
             menu.setBounds(500, 50, menuWidth, menuHeight);
             this.add(menu);
+            this.repaint();
+            
             menu.addEvent(index -> {
                 switch (index) {
                     case 0:
                         togglePause();
                         break;
                     case 1:
-
+                    {
+                        try {
+                            gameThread.setExit(true);
+                            ng.setExit(true);
+                            if(multiplayer)
+                                ng2.setExit(true);
+                            this.remove(menu);
+                            paused = !paused;
+                            this.repaint();
+                            play(selectedSong);
+                        } catch (Exception e) {
+                        }
+                    }
                         break;
+
                     case 2:
-                        frame.getContentPane().removeAll();
-                        GameMenu menu = new GameMenu(frame, (int) screenSize.getWidth(), (int) screenSize.getHeight());
-                        frame.getContentPane().add(menu);
-                        frame.revalidate();
-                        frame.repaint();
+                        paused = false;
+                        gameThread.setExit(true);
+                        ng.setExit(true);
+                        //player.removeComponents(this);
+                        if(multiplayer) {
+                            ng2.setExit(true);
+                            //player2.removeComponents(this);
+                        }
+                        mainMenu.getSongList(multiplayer).switchSongMenu();
                         break;
                 }
             });
-            menu.setVisible(true);
-            menu.requestFocusInWindow();
         } else {
-            ng.resumeAudio();
+            ng.resumeG();
+            if(multiplayer)
+                ng2.resumeG();
+            resumeAudio();
             this.remove(menu);
-            this.requestFocusInWindow();
         }
-        this.revalidate();
-        this.repaint();
     }
 
 }

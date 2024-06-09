@@ -13,6 +13,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class GameMenu extends JPanel {
 
@@ -22,7 +27,10 @@ public class GameMenu extends JPanel {
     int WIDTH;
     int HEIGHT;
     String selectedSong;
-    Menu3D menu;
+    SongList songList;
+    SongList songList2;
+    public Menu3D menu;
+    Clip clip;
     public GameMenu(JFrame frame, int WIDTH, int HEIGHT) {
         
         this.WIDTH = WIDTH;
@@ -31,7 +39,6 @@ public class GameMenu extends JPanel {
         setLayout(null);
         setBackground(new Color(43, 45, 48));
         panelWidth = frame.getWidth() / 4;
-
         menu = new Menu3D();
         menu.addMenuItem("Un jugador");
         menu.addMenuItem("Dos jugadores");
@@ -59,12 +66,18 @@ public class GameMenu extends JPanel {
         });
 
         add(menu);
-        
+        try {
+            playAudio();
+        } catch(Exception e){}
+    }
+
+    public SongList getSongList(boolean multiplayer) {
+        return songList;
     }
 
     private void switchToOnePlayerScene(JFrame frame) {
+        ArrayList<Song> songs = new ArrayList<>();
         try {
-            ArrayList<Song> songs = new ArrayList<>();
             File folder = new File("src/main/java/Resources/Charts/");
             File[] listOfFiles = folder.listFiles();
 
@@ -79,24 +92,8 @@ public class GameMenu extends JPanel {
                         }
                     }
                 }
-                SongList songList = new SongList(this, frame, songs, WIDTH, HEIGHT,1);
-                frame.getContentPane().removeAll();
-                frame.add(songList);
-                frame.revalidate();
-                frame.repaint();
-                //SwingUtilities.invokeLater(menu::requestFocusInWindow);
-                //SwingUtilities.invokeLater(this::requestFocusInWindow);
-                //this.repaint();
-                // Aquí movemos la obtención de la canción seleccionada
-                //selectedSong = songList.getSelectedSong();
-                /*if (selectedSong != null) {
-                    OnePlayerScene onePlayerPanel = new OnePlayerScene(frame,selectedSong);
-                    frame.getContentPane().removeAll();
-                    frame.getContentPane().add(onePlayerPanel);
-                    frame.revalidate();
-                    frame.repaint();
-                    System.out.println("sdjasijdisajdfsafasfasfasfasdas");
-                }*/
+                songList = new SongList(this, frame, songs, WIDTH, HEIGHT,1);
+                songList.switchSongMenu();
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -104,8 +101,8 @@ public class GameMenu extends JPanel {
     }
 
     private void switchToTwoPlayerScene(JFrame frame) {
+        ArrayList<Song> songs = new ArrayList<>();
         try {
-            ArrayList<Song> songs = new ArrayList<>();
 
             File folder = new File("src/main/java/Resources/Charts/");
             File[] listOfFiles = folder.listFiles();
@@ -124,12 +121,8 @@ public class GameMenu extends JPanel {
                     }
                 }
 
-                // Aquí añadimos el SongList al content pane del frame
-                frame.getContentPane().removeAll();
-                frame.add(new SongList(this, frame, songs, WIDTH, HEIGHT,2));
-                frame.revalidate();
-                frame.repaint();
-                
+                songList = new SongList(this, frame, songs, WIDTH, HEIGHT,2);
+                songList.switchSongMenu();
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -183,5 +176,23 @@ public class GameMenu extends JPanel {
                 JOptionPane.showMessageDialog(null, "Please select a WAV file.", "Invalid File Type", JOptionPane.ERROR_MESSAGE);
             }
         }
+    }
+    
+    public void resetMenu(JFrame frame) {
+        frame.getContentPane().removeAll();
+        frame.add(menu);
+        frame.add(this);
+        frame.revalidate();
+        frame.repaint();
+        SwingUtilities.invokeLater(menu::requestFocusInWindow);
+    }
+    
+    public void playAudio() throws LineUnavailableException, UnsupportedAudioFileException, IOException {
+        String audioFilePath= "src/main/java/Resources/Songs/Silence.wav";
+        File audioFile = new File(audioFilePath);
+        AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
+        clip = AudioSystem.getClip();
+        clip.open(audioStream);
+        clip.start();
     }
 }

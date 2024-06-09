@@ -21,24 +21,34 @@ public class NoteGenerator extends Thread {
     long elapsedTime;
     long dt;
     long pausePosition;
-    boolean quit;
+    boolean exit;
+    boolean paused;
     public NoteGenerator(String name, JPanel panel, String selectedSong, Player player, int x, int y) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
         super(name);
+        System.out.println("NoteGenerator Creado");
         this.panel = panel;
         this.player = player;
         notes = new ArrayList<>();
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         ypos = y;
         xpos = x;
-        System.out.println(ypos);
-        System.out.println(xpos);
         readChartFile("src/main/java/Resources/Charts/"+selectedSong+".chart");
         loadAudio("src/main/java/Resources/Songs/"+selectedSong+".wav");
-        quit = false;
+        exit = false;
+        paused = false;
+        dt = (long)(((ypos+35))/(GameNote.getSpeed())* 5) ;
     }
 
     public ArrayList<GameNote> getNotes() {
         return notes;
+    }
+
+    public void setExit(boolean exit) {
+        this.exit = exit;
+    }
+
+    public void setPaused(boolean paused) {
+        this.paused = paused;
     }
     
     public void readChartFile(String filePath) throws IOException {
@@ -98,37 +108,32 @@ public class NoteGenerator extends Thread {
 
     public void playAudio() {
         clip.start();
-        //startTime = System.nanoTime();
-        System.out.println("TIEMPO INICIAL: " + startTime);
     }
 
-    public void resumeAudio() {
-        clip.setMicrosecondPosition(pausePosition);
-        clip.start();
-        startTime = System.currentTimeMillis() - pausePosition / 1000;
+    public void resumeG() {
+        startTime = System.nanoTime() - pausePosition;
+        paused = false;
     }
 
-    public void pauseAudio() {
-        pausePosition = clip.getMicrosecondPosition();
-        clip.stop();
+    public void pauseG() {
+        pausePosition = (long) (elapsedTime * 1000000f);
+        paused = true;
     }
-
+    
 
     @Override
     public void run() {
-        //playAudio();
-        dt = (long)(((ypos))/(GameNote.getSpeed())* 5) ;
-        try {
-            //TimeUnit.NANOSECONDS.sleep(100000000);
-            sleep((long) GameNote.getSpeed() * 100);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         startTime = System.nanoTime();
-        System.out.println("dt: " + dt);
-            while(!quit) {
-                long loopStartTime = System.nanoTime();
-                elapsedTime = (System.nanoTime() - startTime)/1000000;
+     
+        long loopStartTime;
+        long loopEndTime;
+        long loopDuration;
+        long sleepTime;
+        while(!exit) {
+            loopStartTime = System.nanoTime();
+            elapsedTime = (System.nanoTime() - startTime)/1000000;
+            
+            if(!paused) {
                 for (GameNote element : notes) {
                     if(!element.isInScreen()) {
                         if((elapsedTime >= element.getTime() - dt)){
@@ -140,16 +145,18 @@ public class NoteGenerator extends Thread {
                     }
 
                 }
-                try {
-                    long loopEndTime = System.nanoTime(); // Marca de tiempo al final del loop
-                    long loopDuration = loopEndTime - loopStartTime;
-                    long sleepTime = 5000000 - loopDuration; // 5 ms en nanosegundos menos la duración del loop
+            }
+            loopEndTime = System.nanoTime(); // Marca de tiempo al final del loop
+            loopDuration = loopEndTime - loopStartTime;
+            sleepTime = 5000000 - loopDuration; // 5 ms en nanosegundos menos la duración del loop
+            try {
                 if (sleepTime > 0) {
                     TimeUnit.NANOSECONDS.sleep(sleepTime);
                 }
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
+        System.out.println("NOTEGENERATOR FINALIZADO");
     }
 }
