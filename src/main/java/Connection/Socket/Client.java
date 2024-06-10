@@ -77,11 +77,7 @@ public class Client extends JPanel {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                    frame.getContentPane().removeAll();
-                    GameMenu gameMenu = new GameMenu(frame, WIDTH, HEIGHT);
-                    frame.getContentPane().add(gameMenu);
-                    frame.revalidate();
-                    frame.repaint();
+                    gameMenu.resetMenu(frame);
                     Toolkit toolkit = Toolkit.getDefaultToolkit();
                     Image image = toolkit.createImage(new byte[0]);
                     Cursor transparentCursor = toolkit.createCustomCursor(image, new Point(0, 0), "invisibleCursor");

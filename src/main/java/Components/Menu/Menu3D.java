@@ -19,14 +19,11 @@ import javax.swing.SwingUtilities;
 public class Menu3D extends JComponent {
 
     private final List<EventMenu> events = new ArrayList<>();
-    protected final List<Menu3dItem> items = new ArrayList<>();
+    public final List<Menu3dItem> items = new ArrayList<>();
     private final int left = 60;
-    private int pressedIndex = 0;
+    public int pressedIndex = 0;
     private final int menuHeight = 50;
-    private ControllerManager controllers;
-    private boolean initialized = false;
-    private volatile boolean running = true;
-    private Thread controllerThread;
+    ControllerManager controllers = new ControllerManager();
 
     public Menu3D() {
         setFocusable(true);
@@ -39,48 +36,10 @@ public class Menu3D extends JComponent {
                 handleInput(e.getKeyCode());
             }
         });
+        //initController();
 
-        controllerThread = new Thread(() -> {
-            try {
-                controllers = new ControllerManager();
-                controllers.initSDLGamepad();
-                initialized = true;
-            } catch (Exception e) {
-                e.printStackTrace();
-                initialized = false;
-            }
 
-            while (running) {
-                if (initialized) {
-                    ControllerState currState = controllers.getState(0); // 0 is the index of the first controller
-
-                    if (currState.isConnected) {
-                        if (currState.dpadUpJustPressed) {
-                            handleInput(KeyEvent.VK_UP);
-                        }
-                        if (currState.dpadDownJustPressed) {
-                            handleInput(KeyEvent.VK_DOWN);
-                        }
-                        if (currState.startJustPressed) {
-                            handleInput(KeyEvent.VK_ENTER);
-                        }
-                        if (currState.aJustPressed) {
-                            handleInput(KeyEvent.VK_ENTER);
-                        }
-                    }
-                }
-
-                try {
-                    Thread.sleep(50); // Sleep to avoid flooding the console
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        controllerThread.start();
     }
-
 
     public void handleInput(int keyCode) {
         switch (keyCode) {
@@ -101,11 +60,11 @@ public class Menu3D extends JComponent {
                     items.get(pressedIndex).getAnimator().show();
                     hideMenu(pressedIndex);
                     runEvent();
-
                 }
                 break;
         }
     }
+
 
     private void init() {
         setForeground(new Color(238, 238, 238));
@@ -115,7 +74,7 @@ public class Menu3D extends JComponent {
         this.events.add(event);
     }
 
-    private void runEvent() {
+    public void runEvent() {
         for (EventMenu event : events) {
             event.menuSelected(pressedIndex);
         }
@@ -138,7 +97,7 @@ public class Menu3D extends JComponent {
         return -1;
     }
 
-    private void hideMenu(int exitIndex) {
+    public void hideMenu(int exitIndex) {
         for (int i = 0; i < items.size(); i++) {
             if (i != exitIndex) {
                 items.get(i).getAnimator().hide();
@@ -174,16 +133,29 @@ public class Menu3D extends JComponent {
     public int getPressedIndex() {
         return pressedIndex;
     }
-
-    public void cleanup() {
-        KeyListener[] keyListeners = this.getKeyListeners();
-        for (KeyListener keyListener : keyListeners) {
-            this.removeKeyListener(keyListener);
-        }
-        try {
-            controllerThread.join();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void initController(){
+        controllers.initSDLGamepad();
+        ControllerState currState = controllers.getState(0);
+        new Thread(() -> {
+            while (true) {
+                if (currState.isConnected) {
+                    if (currState.dpadUpJustPressed) {
+                        handleInput(KeyEvent.VK_UP);
+                    }
+                    if (currState.dpadDownJustPressed) {
+                        handleInput(KeyEvent.VK_DOWN);
+                    }
+                    if (currState.startJustPressed || currState.aJustPressed) {
+                        handleInput(KeyEvent.VK_ENTER);
+                    }
+                }
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
+
 }

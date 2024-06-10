@@ -23,22 +23,24 @@ public class SongList extends JPanel {
     private final Menu3D menu;
     private final Panel panel = new Panel();
     ImageIcon albumCover;
-    private final ControllerManager controllers;
-    private volatile boolean listeningForController = true;
+    private ControllerManager controllers;
+    private volatile boolean running = true;
+
     private int players;
     private JFrame frame;
     private final ArrayList<Song> songs = new ArrayList<>();
     private GameMenu gameMenu;
-    private Thread controllerThread;
 
     public SongList(GameMenu gameMenu, JFrame frame, int WIDTH, int HEIGHT, int players) {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setBackground(new Color(43, 45, 48));
         setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        controllers = new ControllerManager();
         this.frame = frame;
         this.gameMenu = gameMenu;
+        this.players = players;
+
+        //controllers = new ControllerManager();
 
 
         gbc.gridx = 0;
@@ -84,41 +86,17 @@ public class SongList extends JPanel {
                 handleInput(e.getKeyCode());
             }
         });
+        //startControllerListener();
     }
 
-    private void startControllerListener() {
-        controllerThread = new Thread(() -> {
-            while (listeningForController) {
-                ControllerState currState = controllers.getState(0);
-                if (currState.isConnected) {
-                    if (currState.dpadUpJustPressed) {
-                        handleInput(KeyEvent.VK_UP);
-                    }
-                    if (currState.dpadDownJustPressed) {
-                        handleInput(KeyEvent.VK_DOWN);
-                    }
-                    if (currState.startJustPressed || currState.aJustPressed) {
-                        handleInput(KeyEvent.VK_ENTER);
-                    }
-                    if (currState.bJustPressed) {
-                        handleInput(KeyEvent.VK_ESCAPE);
-                    }
-                }
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        controllerThread.start();
-    }
 
     public void handleInput(int key) {
         switch (key) {
             case VK_ENTER:
+                gameMenu.getClip().stop();
                 if (players == 1) {
                     try {
+                running = false;
                         frame.getContentPane().removeAll();
                         frame.add(new OnePlayerScene(gameMenu, frame, songs.get(menu.getPressedIndex())));
                     } catch (Exception exception) {
@@ -126,6 +104,7 @@ public class SongList extends JPanel {
                     }
                 } else {
                     try {
+                running = false;
                         frame.getContentPane().removeAll();
                         frame.add(new TwoPlayerScene(gameMenu, frame, songs.get(menu.getPressedIndex())));
                     } catch (Exception exception) {
@@ -134,15 +113,16 @@ public class SongList extends JPanel {
                 }
                 frame.revalidate();
                 frame.repaint();
-                listeningForController = false;
                 break;
             case KeyEvent.VK_ESCAPE:
-                listeningForController = false;
+                gameMenu.getClip().stop();
+                running = false;
                 frame.getContentPane().removeAll();
                 frame.getContentPane().add(gameMenu);
                 frame.revalidate();
                 frame.repaint();
                 gameMenu.resetMenu(frame);
+                gameMenu.setRunning(true);
                 break;
             case KeyEvent.VK_UP, KeyEvent.VK_DOWN:
                 updatePanel(songs.get(menu.getPressedIndex()));
@@ -214,6 +194,66 @@ public class SongList extends JPanel {
             }
         }
         return song;
+    }
+
+    private void startControllerListener() {
+        new Thread(() -> {
+            controllers.initSDLGamepad();
+            while (running) {
+                ControllerState currState = controllers.getState(0);
+                if (currState.isConnected) {
+                    if (currState.dpadUpJustPressed) {
+                        if (menu.pressedIndex > 0) {
+                            menu.pressedIndex--;
+                            menu.repaint();
+                        }
+                    }
+                    if (currState.dpadDownJustPressed) {
+                        if (menu.pressedIndex < menu.items.size() - 1) {
+                            menu.pressedIndex++;
+                            menu.repaint();
+                        }
+                    }
+                    if (currState.bJustPressed){
+                        frame.getContentPane().removeAll();
+                        frame.getContentPane().add(gameMenu);
+                        frame.revalidate();
+                        frame.repaint();
+                        gameMenu.resetMenu(frame);
+                    }
+                    if (currState.startJustPressed || currState.aJustPressed) {
+                        if (menu.pressedIndex != -1) {
+                            menu.items.get(menu.pressedIndex).getAnimator().show();
+                            menu.hideMenu(menu.pressedIndex);
+                            menu.runEvent();
+                            if (players == 1) {
+                                try {
+                                    frame.getContentPane().removeAll();
+                                    frame.add(new OnePlayerScene(gameMenu, frame, songs.get(menu.getPressedIndex())));
+                                    controllers.quitSDLGamepad();
+                                } catch (Exception exception) {
+                                    exception.printStackTrace();
+                                }
+                            } else {
+                                try {
+                                    frame.getContentPane().removeAll();
+                                    frame.add(new TwoPlayerScene(gameMenu, frame, songs.get(menu.getPressedIndex())));
+                                    controllers.quitSDLGamepad();
+                                } catch (Exception exception) {
+                                    exception.printStackTrace();
+                                }
+                            }
+
+                        }
+                    }
+                }
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     public void loadSongs() {

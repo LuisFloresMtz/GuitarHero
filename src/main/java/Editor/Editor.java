@@ -7,6 +7,8 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -184,13 +186,13 @@ public class Editor extends JPanel{
         add(save);
         
         durationLabel = new JLabel("Duracion: ");
-        durationLabel.setBounds(width - 300, 50 ,300,100);
+        durationLabel.setBounds(width - 325, 50 ,300,100);
         durationLabel.setFont(new Font("Verdana", Font.BOLD, 18));
         durationLabel.setForeground(new Color(255, 255, 255)); 
         durationLabel.setOpaque(false);
         add(durationLabel);
-        timeLabel = new JLabel("Transcurrido: ");
-        timeLabel.setBounds(width - 300, 100 ,300,100);
+        timeLabel = new JLabel("Tiempo transcurrido: ");
+        timeLabel.setBounds(width - 400, 100 ,300,100);
         timeLabel.setFont(new Font("Verdana", Font.BOLD, 18));
         timeLabel.setForeground(new Color(255, 255, 255)); 
         timeLabel.setOpaque(false);
@@ -483,6 +485,11 @@ public class Editor extends JPanel{
                 if(clip != null)
                     clip.stop();
                 mainMenu.resetMenu(frame);
+                Toolkit toolkit = Toolkit.getDefaultToolkit();
+                Image image = toolkit.createImage(new byte[0]);
+                Cursor transparentCursor = toolkit.createCustomCursor(image, new Point(0, 0), "invisibleCursor");
+                
+                frame.setCursor(transparentCursor);
             }
         });
         returnButton.setBounds(width - 300, ypos,150,50);
@@ -603,7 +610,7 @@ public class Editor extends JPanel{
                     loopStartTime = System.nanoTime();
                     elapsedTime = (System.nanoTime() - startTime)/1000000;
                     if (!paused) {
-                        timeLabel.setText("Transcurrido: " + elapsedTime/1000f + "s" );
+                        timeLabel.setText("Tiempo transcurrido: " + elapsedTime/1000f + "s" );
                         for (GameNote element : notes) {
                             if(!element.isInScreen()) { 
                                 if (elapsedTime >= element.getTime() - dt) 
