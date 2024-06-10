@@ -16,7 +16,6 @@ public class TwoPlayerScene {
     Player player2;
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     public TwoPlayerScene(GameMenu mainMenu, JFrame frame,String selectedSong) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
-        System.out.println("TWOPLAYERSSCENE CREADO");
         Tab.setMultiplayer(true);
         player1 = new Player(1, selectedSong, frame);
         player2 = new Player(2, selectedSong, frame);

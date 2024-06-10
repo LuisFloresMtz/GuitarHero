@@ -36,8 +36,7 @@ public class Player {
         this.score = 0;
         this.selectedSong = selectedSong;
     }
-    public Player(int playerNumber, String selectedSong, JFrame frame/*, int xpos, int ypos*/) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
-        System.out.println("PLAYER CREADO");
+    public Player(int playerNumber, String selectedSong, JFrame frame) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
         this.playerNumber = playerNumber;
         this.life = 50;
         this.noteStreak = 0;

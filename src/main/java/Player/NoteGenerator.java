@@ -25,7 +25,6 @@ public class NoteGenerator extends Thread {
     boolean paused;
     public NoteGenerator(String name, JPanel panel, String selectedSong, Player player, int x, int y) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
         super(name);
-        System.out.println("NoteGenerator Creado");
         this.panel = panel;
         this.player = player;
         notes = new ArrayList<>();
@@ -37,6 +36,7 @@ public class NoteGenerator extends Thread {
         exit = false;
         paused = false;
         dt = (long)(((ypos+35))/(GameNote.getSpeed())* 5) ;
+        
     }
 
     public ArrayList<GameNote> getNotes() {
@@ -93,8 +93,6 @@ public class NoteGenerator extends Thread {
             };
             if (note != null) {
                 notes.add(note);
-                //note.setBounds(note.getX(), note.getY(), 50, 50);
-                //System.out.println("Nota añadida");
             }
         }
     }

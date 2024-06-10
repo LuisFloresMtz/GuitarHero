@@ -1,5 +1,6 @@
 package Scenes.Menu;
 
+import Editor.Editor;
 import Player.*;
 import Scenes.OnePlayerScene;
 import Scenes.SongList.SongList;
@@ -21,7 +22,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class GameMenu extends JPanel {
 
-    JnaFileChooser fileChooser = new JnaFileChooser();
+    //JnaFileChooser fileChooser = new JnaFileChooser();
     int panelWidth;
     int panelHeight = 300;
     int WIDTH;
@@ -151,31 +152,12 @@ public class GameMenu extends JPanel {
     }
 
     private void switchToEdit(JFrame frame) {
-        fileChooser.setMultiSelectionEnabled(false);
-        fileChooser.setTitle("Selecciona una cancion");
-
-        if (fileChooser.showOpenDialog(null)) {
-            File selectedFile = fileChooser.getSelectedFile();
-            if (selectedFile.getName().toLowerCase().endsWith(".wav")) {
-                if (fileChooser.getSelectedFile() != null) {
-                    String path = fileChooser.getSelectedFile().getAbsolutePath();
-                    String name = fileChooser.getSelectedFile().getName();
-                    String newPath = "src/main/java/Resources/Songs/" + name;
-                    try {
-                        java.nio.file.Files.copy(java.nio.file.Paths.get(path), java.nio.file.Paths.get(newPath), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-                    } catch (Exception ex) {
-                        System.out.println(ex.getMessage());
-                    }
-                    Editor editor = new Editor(newPath);
-                    frame.getContentPane().removeAll();
-                    frame.getContentPane().add(editor);
-                    frame.revalidate();
-                    frame.repaint();
-                }
-            } else {
-                JOptionPane.showMessageDialog(null, "Please select a WAV file.", "Invalid File Type", JOptionPane.ERROR_MESSAGE);
-            }
-        }
+        Editor editor = new Editor(frame,this);
+        frame.getContentPane().removeAll();
+        frame.getContentPane().add(editor);
+        frame.revalidate();
+        frame.repaint();
+        
     }
     
     public void resetMenu(JFrame frame) {

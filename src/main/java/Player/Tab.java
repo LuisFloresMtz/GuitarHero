@@ -55,7 +55,6 @@ public class Tab extends JPanel {
 
 
     public Tab(GameMenu mainMenu, Player player, Player player2, String selectedSong, JFrame frame) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
-        System.out.println("TAB Creado");
         setLayout(new GridLayout(1, 1));
         setSize(new Dimension((int) screenSize.getWidth(), (int) screenSize.getHeight()));
         this.player = player;
@@ -70,19 +69,14 @@ public class Tab extends JPanel {
        
         if(multiplayer){
             xpos /= 2;
-            //this.player2 = new Player(2, selectedSong,frame/*,xpos * 3,ypos*/);
             this.player2.setXpos(xpos * 3);
             this.player2.setYpos(ypos);
             this.player2.addComponents(this,screenSize.width - 145);
-            //ng2 = new NoteGenerator("Note Generator", this, selectedSong, player2, xpos * 3, ypos);
-            //notes2 = ng2.getNotes();
         }
-        //this.player = new Player(1,selectedSong,frame/*,xpos,ypos*/);
         this.player.setXpos(xpos);
         this.player.setYpos(ypos);
         this.player.addComponents(this,70);
-        //ng = new NoteGenerator("Note Generator", this, selectedSong, player, xpos, ypos);
-        //notes = ng.getNotes();
+
         KB();
         setFocusable(true);
         JLabel gifLabel;
@@ -434,19 +428,11 @@ public class Tab extends JPanel {
         clip.start();
     }
      public void resumeAudio() {
-        //clip.setMicrosecondPosition(pausePosition);
-        //startTime = System.nanoTime() - pausePosition;
         clip.start();
-        //startTime = System.currentTimeMillis() - pausePosition / 1000;
-        //paused = false;
     }
 
     public void pauseAudio() {
-        //pausePosition = clip.getMicrosecondPosition();
-        //pausePosition = (long) (elapsedTime * 1000000f);
         clip.stop();
-       // paused = true;
-        //wait();
     }
     void togglePause() {
         paused = !paused;
@@ -456,9 +442,7 @@ public class Tab extends JPanel {
             if(multiplayer)
                 ng2.pauseG();
             pauseAudio();
-            //if(menu == null) 
             menu = new PauseMenu();
-            //menu.setVisible(true);
             int menuWidth = 600;
             int menuHeight = 500;
             menu.setBounds(500, 50, menuWidth, menuHeight);
