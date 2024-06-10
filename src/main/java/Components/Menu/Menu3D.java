@@ -56,6 +56,7 @@ public class Menu3D extends JComponent {
                         handleInput(KeyEvent.VK_ENTER);
                     }
                 }
+
                 try {
                     Thread.sleep(50); // Sleep to avoid flooding the console
                 } catch (InterruptedException e) {

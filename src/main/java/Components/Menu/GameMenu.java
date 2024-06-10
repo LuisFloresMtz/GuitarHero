@@ -1,5 +1,9 @@
 package Components.Menu;
 
+import Editor.Editor;
+import Player.*;
+import Scenes.OnePlayerScene;
+import Scenes.SongList.SongList;
 import Connection.Socket.Client;
 import Player.Editor;
 import Components.Scenes.ControllerSelection;
@@ -17,6 +21,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class GameMenu extends JPanel {
 
@@ -30,6 +39,10 @@ public class GameMenu extends JPanel {
     ControllerManager controllers = new ControllerManager();
     ArrayList<Song> songs = new ArrayList<>();
 
+    SongList songList;
+    SongList songList2;
+    public Menu3D menu;
+    Clip clip;
     public GameMenu(JFrame frame, int WIDTH, int HEIGHT) {
 
         this.WIDTH = WIDTH;
@@ -41,6 +54,7 @@ public class GameMenu extends JPanel {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setLayout(null);
         setBackground(new Color(43, 45, 48));
+        panelWidth = frame.getWidth() / 4;
 
         menu = new Menu3D();
         menu.addMenuItem("Un jugador");
@@ -75,12 +89,18 @@ public class GameMenu extends JPanel {
         });
 
         add(menu);
+        try {
+            playAudio();
+        } catch(Exception e){}
+    }
 
+    public SongList getSongList(boolean multiplayer) {
+        return songList;
     }
 
     private void switchToOnePlayerScene(JFrame frame) {
+        ArrayList<Song> songs = new ArrayList<>();
         try {
-            ArrayList<Song> songs = new ArrayList<>();
             File folder = new File("src/main/java/Resources/Charts/");
             File[] listOfFiles = folder.listFiles();
 
@@ -95,25 +115,8 @@ public class GameMenu extends JPanel {
                         }
                     }
                 }
-
-                SongList songList = new SongList(frame, songs, getWidth(), getHeight(), 1, controllers);
-                frame.getContentPane().removeAll();
-                frame.add(songList);
-                frame.revalidate();
-                frame.repaint();
-                //SwingUtilities.invokeLater(menu::requestFocusInWindow);
-                //SwingUtilities.invokeLater(this::requestFocusInWindow);
-                //this.repaint();
-                // Aquí movemos la obtención de la canción seleccionada
-                //selectedSong = songList.getSelectedSong();
-                /*if (selectedSong != null) {
-                    OnePlayerScene onePlayerPanel = new OnePlayerScene(frame,selectedSong);
-                    frame.getContentPane().removeAll();
-                    frame.getContentPane().add(onePlayerPanel);
-                    frame.revalidate();
-                    frame.repaint();
-                    System.out.println("sdjasijdisajdfsafasfasfasfasdas");
-                }*/
+                songList = new SongList(this, frame, songs, WIDTH, HEIGHT,1);
+                songList.switchSongMenu();
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -123,6 +126,8 @@ public class GameMenu extends JPanel {
 
 
     private void switchToTwoPlayerScene(JFrame frame) {
+        ArrayList<Song> songs = new ArrayList<>();
+        try {
         ControllerSelection controllerSelection = new ControllerSelection(frame, getWidth(), getHeight());
 
         ControllerState currState = controllers.getState(0);
@@ -158,6 +163,8 @@ public class GameMenu extends JPanel {
                 frame.revalidate();
                 frame.repaint();
 
+                songList = new SongList(this, frame, songs, WIDTH, HEIGHT,2);
+                songList.switchSongMenu();
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -192,31 +199,30 @@ public class GameMenu extends JPanel {
     }
 
     private void switchToEdit(JFrame frame) {
-        fileChooser.setMultiSelectionEnabled(false);
-        fileChooser.setTitle("Selecciona una canción");
+        Editor editor = new Editor(frame,this);
+        frame.getContentPane().removeAll();
+        frame.getContentPane().add(editor);
+        frame.revalidate();
+        frame.repaint();
 
-        if (fileChooser.showOpenDialog(null)) {
-            File selectedFile = fileChooser.getSelectedFile();
-            if (selectedFile.getName().toLowerCase().endsWith(".wav")) {
-                if (fileChooser.getSelectedFile() != null) {
-                    String path = fileChooser.getSelectedFile().getAbsolutePath();
-                    String name = fileChooser.getSelectedFile().getName();
-                    String newPath = "src/main/java/Resources/Songs/" + name;
-                    try {
-                        java.nio.file.Files.copy(java.nio.file.Paths.get(path), java.nio.file.Paths.get(newPath), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-                    } catch (Exception ex) {
-                        System.out.println(ex.getMessage());
-                    }
-                    Editor editor = new Editor(newPath);
-                    frame.getContentPane().removeAll();
-                    frame.getContentPane().add(editor);
-                    frame.revalidate();
-                    frame.repaint();
-                }
-            } else {
-                JOptionPane.showMessageDialog(null, "Please select a WAV file.", "Invalid File Type", JOptionPane.ERROR_MESSAGE);
-            }
-        }
+    }
+
+    public void resetMenu(JFrame frame) {
+        frame.getContentPane().removeAll();
+        frame.add(menu);
+        frame.add(this);
+        frame.revalidate();
+        frame.repaint();
+        SwingUtilities.invokeLater(menu::requestFocusInWindow);
+    }
+
+    public void playAudio() throws LineUnavailableException, UnsupportedAudioFileException, IOException {
+        String audioFilePath= "src/main/java/Resources/Songs/Silence.wav";
+        File audioFile = new File(audioFilePath);
+        AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
+        clip = AudioSystem.getClip();
+        clip.open(audioStream);
+        clip.start();
     }
 
     public void switchToOnline(JFrame frame){

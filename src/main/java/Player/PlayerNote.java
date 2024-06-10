@@ -7,7 +7,7 @@ public class PlayerNote extends Note {
     private boolean clicked;
     private Color colorClick;
 
-    PlayerNote(Color color, Color borderColor, Color colorClick) {
+    public PlayerNote(Color color, Color borderColor, Color colorClick) {
         super(color, borderColor);
         this.released = false;
         this.colorClick = colorClick;
@@ -45,7 +45,7 @@ public class PlayerNote extends Note {
     }
 
     @Override
-    protected void paintComponent(Graphics g) {
+    public void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 

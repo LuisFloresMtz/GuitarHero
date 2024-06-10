@@ -12,7 +12,8 @@ public class GameNote extends Note {
     private boolean inScreen;
     private boolean scored;
     private int time;
-    private static double speed = 3;
+    private static double speed = 3.5;
+    private int button;
 
     public GameNote(Color color, Color borderColor) {
         super(color, borderColor);
@@ -25,6 +26,16 @@ public class GameNote extends Note {
         this.time = time;
         this.inScreen = false;
         this.scored = false;
+    }
+    
+    public GameNote(int x, int y, Color color, Color borderColor, int time, int button) {
+        super(color, borderColor);
+        this.x = (double)x;
+        this.y = y;
+        this.time = time;
+        this.inScreen = false;
+        this.scored = false;
+        this.button = button;
     }
     
     public GameNote(Color color, int time) {
@@ -68,8 +79,8 @@ public class GameNote extends Note {
         return inScreen;
     }
 
-    public void setInScreen(boolean added) {
-        this.inScreen = added;
+    public void setInScreen(boolean inScreen) {
+        this.inScreen = inScreen;
     }
 
     public int getTime() {
@@ -92,6 +103,10 @@ public class GameNote extends Note {
         return speed;
     }
     
+    public String toString() {
+        return "    " + String.valueOf(time) + " = " + String.valueOf(button) + "\n";
+    }
+    
     @Override
     protected void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
@@ -106,4 +121,6 @@ public class GameNote extends Note {
         g2.fillRoundRect(4, 4, getWidth() - 8, getHeight() - 8, radius, radius);
         super.paintComponent(g);
     }
+
+
 }
