@@ -13,9 +13,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class Server {
     ServerSocket serverSocket;
@@ -30,103 +33,58 @@ public class Server {
         this.frame = frame;
         controllers = new ControllerManager();
         this.gameMenu = gameMenu;
+        handleConnection(frame);
+
+
+    }
+
+    private void handleConnection(JFrame frame) {
+        DatagramSocket s = null;
         try {
-            serverSocket = new ServerSocket(5000);
-            System.out.println("Esperando conexiones...");
-            clientSocket = serverSocket.accept();
-
-            out = new ObjectOutputStream(clientSocket.getOutputStream());
-            in = new ObjectInputStream(clientSocket.getInputStream());
-
-            String message = (String) in.readObject();
-            if ("CONNECTION_OK".equals(message)) {
-                System.out.println("Conexión confirmada por el cliente");
-
-                out.writeObject("Conexión establecida exitosamente");
-                out.flush();
-
-                SwingUtilities.invokeLater(() -> {
-                    try {
-                        ArrayList<Song> songs = new ArrayList<>();
-
-                        File folder = new File("src/main/java/Resources/Charts/");
-                        File[] listOfFiles = folder.listFiles();
-
-                        if (listOfFiles != null) {
-                            System.out.println("Number of files: " + listOfFiles.length);
-
-                            for (File file : listOfFiles) {
-                                if (file.isFile()) {
-                                    try {
-                                        Song song = readSongFromFile(file);
-                                        songs.add(song);
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }
-
-                            frame.getContentPane().removeAll();
-                            frame.add(new SongList(gameMenu,frame, frame.getWidth(), frame.getHeight(), 2));
-                            frame.revalidate();
-                            frame.repaint();
-                        }
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                });
-
-                new Thread(() -> {
-                    try {
-                        while (true) {
-                            byte[] imageBytes = captureFrame(frame);
-                            out.writeObject(imageBytes);
-                            out.flush();
-                        }
-                    } catch (IOException | AWTException e) {
-                        e.printStackTrace();
-                    }
-                }).start();
-            } else {
-                System.out.println("Conexión no confirmada");
-            }
+            s = new DatagramSocket(5000);
         } catch (Exception e) {
             e.printStackTrace();
+            return;
         }
-    }
 
-    private byte[] captureFrame(JFrame frame) throws AWTException, IOException {
-        BufferedImage bufferedImage = new BufferedImage(frame.getWidth(), frame.getHeight(), BufferedImage.TYPE_INT_RGB);
-        Graphics2D g2d = bufferedImage.createGraphics();
-        frame.paint(g2d);
-        g2d.dispose();
+        System.out.println("Servidor Activo. Esperando conexiones...");
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(bufferedImage, "jpg", baos);
-        baos.flush();
-        byte[] imageInByte = baos.toByteArray();
-        baos.close();
 
-        return imageInByte;
-    }
+        DatagramSocket finalS = s;
 
-    private Song readSongFromFile(File file) throws IOException {
-        Song song = new Song();
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                line = line.trim();
-                if (line.startsWith("Name = ")) {
-                    song.setName(line.substring(8, line.length() - 1));
-                } else if (line.startsWith("Artist = ")) {
-                    song.setBand(line.substring(10, line.length() - 1));
-                } else if (line.startsWith("Difficulty = ")) {
-                    song.setDifficulty(Integer.parseInt(line.substring(13)));
-                } else if (line.startsWith("Genre = ")) {
-                    song.setGenre(line.substring(9, line.length() - 1));
+        new Thread(() -> {
+            try {
+                while (true) {
+                    DatagramPacket recibido = new DatagramPacket(new byte[1024], 1024);
+                    System.out.println("Esperando...");
+                    finalS.receive(recibido);
+                    System.out.println("Ha llegado una petición \n");
+                    System.out.println("Procedente de :" + recibido.getAddress());
+                    System.out.println("En el puerto :" + recibido.getPort());
+                    String dato = new String(recibido.getData()).split("\0")[0];
+                    System.out.println("Dato: " + dato);
+                    System.out.println("Sirviendo la petición");
+
+                    String message = "HORA DEL SERVIDOR " + new Date() + "\0";
+                    byte[] msg = message.getBytes();
+                    DatagramPacket paquete = new DatagramPacket(msg, msg.length, recibido.getAddress(), recibido.getPort());
+                    finalS.send(paquete);
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).start();
+
+        // Mantener la aplicación en ejecución
+        while (true) {
+            try {
+                Thread.sleep(1000);  // Mantener el servidor activo
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
-        return song;
     }
+
 }
+
+
