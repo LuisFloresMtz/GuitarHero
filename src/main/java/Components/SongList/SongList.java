@@ -33,24 +33,42 @@ public class SongList extends JPanel {
 
     public SongList(GameMenu gameMenu, JFrame frame, int WIDTH, int HEIGHT, int players) {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
-        setLayout(new GridLayout(1, 2));
         setBackground(new Color(43, 45, 48));
-        setAlignmentX(Component.CENTER_ALIGNMENT);
-        this.frame = frame;
-        this.players = players;
-        this.gameMenu = gameMenu;
-        loadSongs();
-
+        setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
         controllers = new ControllerManager();
-        controllers.initSDLGamepad();
+        this.frame = frame;
+        this.gameMenu = gameMenu;
+
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridheight = 3;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.weightx = 1;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.VERTICAL;
 
         menu = new Menu3D();
-        int menuWidth = (WIDTH / 6);
+        int menuWidth = (WIDTH / 4);
         int menuHeight = songs.size() * menu.getMenuHeight() + 75;
         menu.setPreferredSize(new Dimension(menuWidth, menuHeight));
 
-        add(menu);
-        add(panel);
+        add(menu, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.gridheight = 1;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.weightx = 1;
+        gbc.weighty = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+
+        panel.setPreferredSize(new Dimension((WIDTH / 4), HEIGHT-(HEIGHT / 3) ));
+
+        add(panel, gbc);
+        loadSongs();
 
         for (Song song : songs) {
             menu.addMenuItem(song.getName());
@@ -66,8 +84,6 @@ public class SongList extends JPanel {
                 handleInput(e.getKeyCode());
             }
         });
-
-        startControllerListener();
     }
 
     private void startControllerListener() {
@@ -101,18 +117,17 @@ public class SongList extends JPanel {
     public void handleInput(int key) {
         switch (key) {
             case VK_ENTER:
-                selectedSong = songs.get(menu.getPressedIndex()).getName();
                 if (players == 1) {
                     try {
                         frame.getContentPane().removeAll();
-                        frame.add(new OnePlayerScene(gameMenu, frame, selectedSong));
+                        frame.add(new OnePlayerScene(gameMenu, frame, songs.get(menu.getPressedIndex())));
                     } catch (Exception exception) {
                         exception.printStackTrace();
                     }
                 } else {
                     try {
                         frame.getContentPane().removeAll();
-                        frame.add(new TwoPlayerScene(gameMenu, frame, selectedSong));
+                        frame.add(new TwoPlayerScene(gameMenu, frame, songs.get(menu.getPressedIndex())));
                     } catch (Exception exception) {
                         exception.printStackTrace();
                     }
@@ -127,11 +142,9 @@ public class SongList extends JPanel {
                 frame.getContentPane().add(gameMenu);
                 frame.revalidate();
                 frame.repaint();
+                gameMenu.resetMenu(frame);
                 break;
-            case KeyEvent.VK_UP:
-                updatePanel(songs.get(menu.getPressedIndex()));
-                break;
-            case KeyEvent.VK_DOWN:
+            case KeyEvent.VK_UP, KeyEvent.VK_DOWN:
                 updatePanel(songs.get(menu.getPressedIndex()));
                 break;
         }
@@ -142,8 +155,18 @@ public class SongList extends JPanel {
     }
 
     public void updatePanel(Song song) {
-        albumCover = new ImageIcon("src/main/java/Resources/Images/" + song.getName() + ".jpg");
+        panel.setLayout(new GridBagLayout());
 
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = GridBagConstraints.RELATIVE;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.insets = new Insets(10, 0, 10, 75);
+        gbc.ipadx = 10;
+        gbc.weightx = 1.0;
+        panel.removeAll();
+
+        ImageIcon albumCover = new ImageIcon("src/main/java/Resources/Images/" + song.getName() + ".jpg");
         Image imgCover = albumCover.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
         JLabel cover = new JLabel(new ImageIcon(imgCover));
 
@@ -163,18 +186,11 @@ public class SongList extends JPanel {
         difficulty.setForeground(Color.WHITE);
         difficulty.setFont(menu.getFont());
 
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        panel.removeAll();
-
-        panel.add(Box.createVerticalGlue());
-        panel.add(cover);
-        panel.add(songName);
-        panel.add(artist);
-        panel.add(genre);
-        panel.add(difficulty);
-        panel.add(Box.createVerticalGlue());
+        panel.add(cover, gbc);
+        panel.add(songName, gbc);
+        panel.add(artist, gbc);
+        panel.add(genre, gbc);
+        panel.add(difficulty, gbc);
 
         panel.revalidate();
         panel.repaint();

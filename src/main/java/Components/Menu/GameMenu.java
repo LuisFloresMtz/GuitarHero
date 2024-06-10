@@ -88,14 +88,11 @@ public class GameMenu extends JPanel {
 
     private void switchToOnePlayerScene(JFrame frame) {
         try {
-
             songList = new SongList(this, frame, WIDTH, HEIGHT, 1);
             frame.getContentPane().removeAll();
             frame.add(songList);
             frame.revalidate();
             frame.repaint();
-            menu.cleanup();
-            menu = null;
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -104,25 +101,14 @@ public class GameMenu extends JPanel {
 
     private void switchToTwoPlayerScene(JFrame frame) {
         try {
-            ControllerSelection controllerSelection = new ControllerSelection(this, frame, getWidth(), getHeight());
-
-            // ControllerState check moved to Menu3D
-
-
             frame.getContentPane().removeAll();
             songList = new SongList(this, frame, WIDTH, HEIGHT, 2);
             frame.add(songList);
             frame.revalidate();
             frame.repaint();
-            menu.cleanup();
-            menu = null;
 
         } catch (Exception ex) {
             ex.printStackTrace();
-            frame.getContentPane().removeAll();
-            frame.add(new SongList(this, frame, getWidth(), getHeight(), 2));
-            frame.revalidate();
-            frame.repaint();
         }
     }
 
@@ -158,7 +144,5 @@ public class GameMenu extends JPanel {
         frame.add(client);
         frame.revalidate();
         frame.repaint();
-        menu.cleanup();
-        menu = null;
     }
 }

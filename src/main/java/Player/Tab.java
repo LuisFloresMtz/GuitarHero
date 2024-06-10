@@ -4,6 +4,7 @@ import Components.Menu.GameMenu;
 import Components.Menu.Menu3D;
 import Components.Menu.PauseMenu;
 import Components.SongList.SongList;
+import Utilities.Song;
 import com.studiohartman.jamepad.ControllerManager;
 import com.studiohartman.jamepad.ControllerState;
 
@@ -56,13 +57,14 @@ public class Tab extends JPanel {
     GameThread gameThread;
 
 
-    public Tab(GameMenu mainMenu, Player player, Player player2, String selectedSong, JFrame frame) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
+    public Tab(GameMenu mainMenu, Player player, Player player2, Song song, JFrame frame) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
         setLayout(new GridLayout(1, 1));
         setSize(new Dimension((int) screenSize.getWidth(), (int) screenSize.getHeight()));
+        setBackgroundImage(song.getDifficulty());
         this.player = player;
         this.player2 = player2;
         this.mainMenu = mainMenu;
-        this.selectedSong = selectedSong;
+        this.selectedSong = song.getName();
         this.exit = false;
         setLayout(null);
         setPreferredSize(new Dimension((int) (screenSize.getWidth()), (int) screenSize.getHeight()));
