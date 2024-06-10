@@ -23,6 +23,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -60,7 +61,7 @@ public class Editor extends JPanel{
     SongPropierties propiertiesPanel;
     String songPath;
     Clip clip;
-    ArrayList<GameNote> notes;
+    CopyOnWriteArrayList<GameNote> notes;
     long elapsedTime;
     long startTime;
     long pausePosition;
@@ -74,6 +75,11 @@ public class Editor extends JPanel{
     PlayerNote yellowNote = new PlayerNote(new Color(54, 58, 59), new Color(254, 254, 53), new Color(254, 254, 53));
     PlayerNote blueNote = new PlayerNote(new Color(54, 58, 59), new Color(63, 162, 211), new Color(63, 162, 211));
     PlayerNote orangeNote = new PlayerNote(new Color(54, 58, 59), new Color(217, 147, 53), new Color(217, 147, 53));
+    ImageIcon pauseIcon = new ImageIcon("src/main/java/Resources/Icons/Pause.png");
+    ImageIcon playIcon = new ImageIcon("src/main/java/Resources/Icons/Play.png");
+    ImageIcon stopIcon = new ImageIcon("src/main/java/Resources/Icons/Stop.png");
+    ImageIcon backwardIcon = new ImageIcon("src/main/java/Resources/Icons/Backward.png");
+    ImageIcon forwardIcon = new ImageIcon("src/main/java/Resources/Icons/Forward.png");
     
     public Editor(JFrame frame, GameMenu mainMenu) {
         setLayout(null);
@@ -90,25 +96,31 @@ public class Editor extends JPanel{
         height = (int) screenSize.getHeight();
         this.frame = frame;
         this.mainMenu = mainMenu;
-        notes = new ArrayList<>();
+        notes = new CopyOnWriteArrayList<>();
         frame.setCursor(Cursor.getDefaultCursor());
         returnButton = new JButton("Regresar");
         songPropierties = new JButton("Propiedades");
         addSongButton = new JButton("Seleccionar Audio");
         remove = new JButton("Remover");
         removeAll = new JButton("Remover Todo");
-        playButton = new JButton("play");
-        playButton.setBounds(50,300,100,50);
-        pauseButton = new JButton("pause");
-        pauseButton.setBounds(50,300,100,50);
-        stopButton = new JButton("stop");
-        stopButton.setBounds(50,350,100,50);
-        resumeButton = new JButton("resume");
-        resumeButton.setBounds(50,300,100,50);
-        forward = new JButton("forward");
-        forward.setBounds(50,400,100,50);
-        backward = new JButton("backward");
-        backward.setBounds(50,450,100,50);
+        playButton = new JButton(playIcon);
+        hover(playButton);
+        playButton.setBounds(150,300,100,75);
+        pauseButton = new JButton(pauseIcon);
+        hover(pauseButton);
+        pauseButton.setBounds(150,300,100,75);
+        stopButton = new JButton(stopIcon);
+        hover(stopButton);
+        stopButton.setBounds(150,380,100,75);
+        resumeButton = new JButton(playIcon);
+        hover(resumeButton);
+        resumeButton.setBounds(150,300,100,75);
+        forward = new JButton(forwardIcon);
+        hover(forward);
+        forward.setBounds(150,460,100,75);
+        backward = new JButton(backwardIcon);
+        hover(backward);
+        backward.setBounds(150,540,100,75);
         forward.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -305,6 +317,15 @@ public class Editor extends JPanel{
         add(orangeNote);
     }
     
+    public void initIcon(JButton button, ImageIcon icon) {
+        button.setContentAreaFilled(false);
+        button.setFocusPainted(false);
+        button.setBorderPainted(false);
+
+        //button.setPreferredSize(new Dimension(icon.getIconWidth(), icon.getIconHeight()));
+        button.setOpaque(false);
+    }
+    
     public void initPauseButton() {
         pauseButton.addActionListener(new ActionListener() {
             @Override
@@ -403,7 +424,7 @@ public class Editor extends JPanel{
                 SwingUtilities.invokeLater(editor::requestFocusInWindow);
             }
         });
-        removeAll.setBounds(200,ypos,150,50);
+        removeAll.setBounds(225,ypos,150,50);
         hover(removeAll);
         add(removeAll);
     }

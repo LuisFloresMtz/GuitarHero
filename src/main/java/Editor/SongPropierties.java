@@ -90,8 +90,6 @@ public class SongPropierties extends JPanel {
                 acceptButton.setBackground(Color.GRAY);
             }
         });
-
-        //acceptButton.setBounds(width - 300, ypos,150,50);
         acceptButton.setBackground(Color.GRAY); 
         acceptButton.setForeground(new Color(238, 238, 238));
         acceptButton.setBorderPainted(false);
@@ -105,14 +103,14 @@ public class SongPropierties extends JPanel {
         add(acceptButton, gbc);
     }
     private void save(Editor panel) {
-        // Aquí puedes implementar la lógica para guardar los valores ingresados
-        System.out.println("Nombre: " + name.getText());
-        System.out.println("Artista: " + artist.getText());
-        System.out.println("Dificultad: " + difficulty.getText());
-        System.out.println("Género: " + genre.getText());
         panel.setSongName(name.getText());
         panel.setArtist(artist.getText());
-        panel.setDifficulty(difficulty.getText());
+        try {
+            Integer.parseInt(difficulty.getText());
+            panel.setDifficulty(difficulty.getText());
+        } catch (Exception e) {
+            panel.setDifficulty("0");
+        }
         panel.setGenre(genre.getText());
     }
 }
