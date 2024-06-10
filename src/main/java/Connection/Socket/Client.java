@@ -1,6 +1,7 @@
 package Connection.Socket;
 
 import Components.Menu.GameMenu;
+import Components.SongList.SongList;
 import Components.Scenes.OnePlayerScene;
 import Utilities.Song;
 
@@ -12,12 +13,11 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.ArrayList;
 
 public class Client extends JPanel {
     int PUERTO_DEL_CLIENTE = 5001;
@@ -30,7 +30,6 @@ public class Client extends JPanel {
     InetAddress destination = null;
     GameMenu gameMenu;
     JFrame frame;
-    private volatile boolean gameRunning = true;
 
     public Client(GameMenu gameMenu, JFrame frame, int WIDTH, int HEIGHT) {
         this.frame = frame;
@@ -128,46 +127,12 @@ public class Client extends JPanel {
         ObjectInputStream ois = new ObjectInputStream(bis);
         Song song = (Song) ois.readObject();
 
-        SwingUtilities.invokeLater(() -> {
-            frame.getContentPane().removeAll();
-            OnePlayerScene onePlayerScene = null;
-            try {
-                onePlayerScene = new OnePlayerScene(gameMenu, frame, song);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (UnsupportedAudioFileException e) {
-                throw new RuntimeException(e);
-            } catch (LineUnavailableException e) {
-                throw new RuntimeException(e);
-            }
-            frame.add(onePlayerScene);
-            frame.revalidate();
-            frame.repaint();
+        frame.getContentPane().removeAll();
+        OnePlayerScene onePlayerScene = new OnePlayerScene(gameMenu, frame, song);
+        frame.getContentPane().add(onePlayerScene);
+        frame.revalidate();
+        frame.repaint();
 
-            new Thread(() -> {
-                while (gameRunning) {
-                    try {
-                        // Enviar el estado del juego al servidor
-                        String estado = "CONTINUA" + "\0"; // Placeholder, reemplazar con lógica real
-                        byte[] estadoMsg = estado.getBytes();
-                        DatagramPacket estadoPaquete = new DatagramPacket(estadoMsg, estadoMsg.length, destination, PUERTO_DEL_SERVIDOR);
-                        dgSocket.send(estadoPaquete);
-
-                        // Recibir el estado del juego del servidor
-                        byte[] estadoBuffer = new byte[1024];
-                        DatagramPacket estadoRecibido = new DatagramPacket(estadoBuffer, estadoBuffer.length);
-                        dgSocket.receive(estadoRecibido);
-                        String estadoServidor = new String(estadoRecibido.getData()).split("\0")[0];
-                        System.out.println("Estado del servidor: " + estadoServidor);
-
-                        // Aquí puedes añadir la lógica para manejar el estado del juego según la respuesta del servidor
-
-                        Thread.sleep(500); // Esperar 500 ms antes de enviar/recibir nuevamente
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).start();
-        });
     }
+
 }
