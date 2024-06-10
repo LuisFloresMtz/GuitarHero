@@ -320,9 +320,7 @@ public class Editor extends JPanel{
     public void initIcon(JButton button, ImageIcon icon) {
         button.setContentAreaFilled(false);
         button.setFocusPainted(false);
-        button.setBorderPainted(false);
-
-        //button.setPreferredSize(new Dimension(icon.getIconWidth(), icon.getIconHeight()));
+        button.setBorderPainted(false);;
         button.setOpaque(false);
     }
     
@@ -506,7 +504,6 @@ public class Editor extends JPanel{
                     if (fileChooser.getSelectedFile() != null) {
                         songPath = fileChooser.getSelectedFile().getAbsolutePath();
                         fileName = fileChooser.getSelectedFile().getName();
-                        //songPath = "src/main/java/Resources/Songs/" + fileName;
                         File audioFile = new File(songPath);
                         AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
                         clip = AudioSystem.getClip();
@@ -619,7 +616,6 @@ public class Editor extends JPanel{
                         throw new RuntimeException(e);
                     }
                 }
-                System.out.println("HILO FINALIZADO");
             }
         });
         gameThread.start();

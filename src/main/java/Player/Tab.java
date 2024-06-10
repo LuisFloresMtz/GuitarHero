@@ -52,8 +52,11 @@ public class Tab extends JPanel {
     ImageIcon gifIcon;
     String selectedSong;
     static boolean multiplayer;
+    static boolean vsCPU = true;
     boolean exit;
     GameThread gameThread;
+    boolean shouldPress;
+    static int presition = 1;
 
 
     public Tab(GameMenu mainMenu, Player player, Player player2, String selectedSong, JFrame frame) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
@@ -213,7 +216,31 @@ public class Tab extends JPanel {
                 g.fillOval(element.getX(), element.getY(), 50, 35);
             }
             if (element.getY() >= ypos && element.getY() <= ypos + 100 && element.isInScreen()) {
-
+                if(vsCPU && player.playerNumber == 2){
+                    switch((int)(Math.random() * presition)) {
+                            case 0: 
+                                shouldPress = true;
+                                switch(element.getButton()) {
+                                    case 0: 
+                                        player2.greenNote.setReleased(true);
+                                        break;
+                                    case 1:
+                                        player2.redNote.setReleased(true);
+                                        break;
+                                    case 2:
+                                        player2.yellowNote.setReleased(true);
+                                        break;
+                                    case 3:
+                                        player2.blueNote.setReleased(true);
+                                        break;
+                                    case 4:
+                                        player2.orangeNote.setReleased(true);
+                                        break;
+                                }
+                                break;
+                    }
+                    
+                }
                 if ((player.greenNote.isReleased() && player.greenNote.isClicked() && element.getX() == player.greenNote.getX()) ||
                         (player.redNote.isReleased() && player.redNote.isClicked() && element.getX() == player.redNote.getX()) ||
                         (player.yellowNote.isReleased() && player.yellowNote.isClicked() && element.getX() == player.yellowNote.getX()) ||
@@ -283,8 +310,7 @@ public class Tab extends JPanel {
                         togglePause();
                         break;
                 }
-                //} else if (playerNumber == 2) {
-                if (multiplayer) {
+                if (multiplayer && !vsCPU) {
                     switch (e.getKeyCode()) {
                         case KeyEvent.VK_Y:
                             player2.greenNote.setReleased(true);
@@ -329,7 +355,7 @@ public class Tab extends JPanel {
                         player.orangeNote.setClicked(true);
                         break;
                 }
-                if (multiplayer) {
+                if (multiplayer && !vsCPU) {
                     switch (e.getKeyCode()) {
                         case KeyEvent.VK_Y:
                             player2.greenNote.setReleased(false);
@@ -430,6 +456,49 @@ public class Tab extends JPanel {
             notes2 = ng2.getNotes();
             ng2.start();
         }
+        if(multiplayer && vsCPU) {
+            Thread CPUThread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while(!exit) {
+                        if(shouldPress) {
+                            try {
+                                TimeUnit.NANOSECONDS.sleep(50000000);
+                            } catch (InterruptedException e) {
+                                throw new RuntimeException(e);
+                            }
+                            if(player2.greenNote.isReleased()){
+                                player2.greenNote.setReleased(false);
+                                player2.greenNote.setClicked(true);
+                            }
+                            if(player2.redNote.isReleased()){
+                                player2.redNote.setReleased(false);
+                                player2.redNote.setClicked(true);
+                            }
+                            if(player2.yellowNote.isReleased()){
+                                player2.yellowNote.setReleased(false);
+                                player2.yellowNote.setClicked(true);
+                            }
+                            if(player2.blueNote.isReleased()){
+                                player2.blueNote.setReleased(false);
+                                player2.blueNote.setClicked(true);
+                            }
+                            if(player2.orangeNote.isReleased()){
+                                player2.orangeNote.setReleased(false);
+                                player2.orangeNote.setClicked(true);
+                            }
+                            shouldPress = false;
+                        }
+                        try {
+                                TimeUnit.NANOSECONDS.sleep(100000000);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                }
+            });
+            CPUThread.start();
+        }
         ng.start();
         playAudio();
         gameThread.start();
@@ -479,6 +548,7 @@ public class Tab extends JPanel {
                         break;
                     case 1: {
                         try {
+                            exit = true;
                             gameThread.setExit(true);
                             ng.setExit(true);
                             if (multiplayer)
@@ -494,16 +564,14 @@ public class Tab extends JPanel {
 
                     case 2:
                         paused = false;
+                        exit = true;
                         gameThread.setExit(true);
-                        //player.removeComponents(this);
                         if (!multiplayer) {
                             ng.setExit(true);
                             switchToSongList(1);
                         } else {
                             ng2.setExit(true);
                             switchToSongList(2);
-                            //player2.removeComponents(this);
-
                         }
 
                         break;

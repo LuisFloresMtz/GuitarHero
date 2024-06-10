@@ -94,8 +94,8 @@ public class GameMenu extends JPanel {
             frame.add(songList);
             frame.revalidate();
             frame.repaint();
-            menu.cleanup();
-            menu = null;
+            //menu.cleanup();
+            //menu = null;
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -114,8 +114,8 @@ public class GameMenu extends JPanel {
             frame.add(songList);
             frame.revalidate();
             frame.repaint();
-            menu.cleanup();
-            menu = null;
+            //menu.cleanup();
+            //menu = null;
 
         } catch (Exception ex) {
             ex.printStackTrace();

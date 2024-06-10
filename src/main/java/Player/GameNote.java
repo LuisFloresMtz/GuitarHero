@@ -68,6 +68,10 @@ public class GameNote extends Note {
     public void setY(double y) {
         this.y = y;
     }
+
+    public int getButton() {
+        return button;
+    }
     
     
     public void physics(double ypos, double dt) {

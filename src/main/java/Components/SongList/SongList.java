@@ -123,10 +123,7 @@ public class SongList extends JPanel {
                 break;
             case KeyEvent.VK_ESCAPE:
                 listeningForController = false;
-                frame.getContentPane().removeAll();
-                frame.getContentPane().add(gameMenu);
-                frame.revalidate();
-                frame.repaint();
+                gameMenu.resetMenu(frame);
                 break;
             case KeyEvent.VK_UP:
                 updatePanel(songs.get(menu.getPressedIndex()));
