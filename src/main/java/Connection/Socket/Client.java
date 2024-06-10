@@ -26,13 +26,15 @@ public class Client extends JPanel {
     ObjectOutputStream out;
     ObjectInputStream in;
     JLabel imageLabel;
+    GameMenu gameMenu;
 
-    public Client(JFrame frame, int WIDTH, int HEIGHT) {
+    public Client(GameMenu gameMenu,JFrame frame, int WIDTH, int HEIGHT) {
         frame.setCursor(Cursor.getDefaultCursor());
         setBackground(new Color(43, 45, 48));
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setLayout(null);
         ip = "";
+        this.gameMenu = gameMenu;
 
         JLabel title = new JLabel("Ip del servidor:");
         title.setBounds(WIDTH / 2 - 50, (HEIGHT / 2) - 100, 200, 50);
@@ -94,7 +96,7 @@ public class Client extends JPanel {
     public void handleServer(JFrame frame) {
         try {
             JOptionPane.showMessageDialog(null, "Esperando al cliente...\n Tu ip es: " + java.net.InetAddress.getLocalHost().getHostAddress());
-            Server server = new Server(frame);
+            Server server = new Server(frame,gameMenu);
         } catch (Exception e) {
             e.printStackTrace();
         }

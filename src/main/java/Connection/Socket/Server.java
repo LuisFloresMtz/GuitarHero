@@ -1,5 +1,6 @@
 package Connection.Socket;
 
+import Components.Menu.GameMenu;
 import Components.Scenes.TwoPlayerScene;
 import Components.SongList.SongList;
 import Utilities.Song;
@@ -23,10 +24,12 @@ public class Server {
     ObjectInputStream in;
     JFrame frame;
     private final ControllerManager controllers;
+    GameMenu gameMenu;
 
-    public Server(JFrame frame) {
+    public Server(JFrame frame, GameMenu gameMenu) {
         this.frame = frame;
         controllers = new ControllerManager();
+        this.gameMenu = gameMenu;
         try {
             serverSocket = new ServerSocket(5000);
             System.out.println("Esperando conexiones...");
@@ -64,7 +67,7 @@ public class Server {
                             }
 
                             frame.getContentPane().removeAll();
-                            frame.add(new SongList(frame, songs, frame.getWidth(), frame.getHeight(), 2, controllers));
+                            frame.add(new SongList(gameMenu,frame, frame.getWidth(), frame.getHeight(), 2));
                             frame.revalidate();
                             frame.repaint();
                         }

@@ -1,5 +1,6 @@
 package Components.Scenes;
 
+import Components.Menu.GameMenu;
 import Player.NoteGenerator;
 
 import Player.*;
@@ -14,15 +15,15 @@ public class TwoPlayerScene extends JPanel {
     Player player1;
     Player player2;
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-    public TwoPlayerScene(JFrame frame,String selectedSong) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
+    public TwoPlayerScene(GameMenu gameMenu, JFrame frame, String selectedSong) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
         Tab.setMultiplayer(true);
         player1 = new Player(1, selectedSong, frame);
         player2 = new Player(2, selectedSong, frame);
-        this.tab = new Tab(player1, player2, selectedSong, frame);
+        this.tab = new Tab(gameMenu, player1, player2, selectedSong, frame);
         setLayout(new GridLayout(1, 1));
         //setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         setSize(new Dimension((int) screenSize.getWidth(), (int) screenSize.getHeight()));
         add(tab);
-        tab.play();
+        tab.play(selectedSong);
     }
 }

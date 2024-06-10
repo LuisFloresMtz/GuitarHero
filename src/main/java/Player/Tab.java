@@ -3,6 +3,7 @@ package Player;
 import Components.Menu.GameMenu;
 import Components.Menu.Menu3D;
 import Components.Menu.PauseMenu;
+import Components.SongList.SongList;
 import com.studiohartman.jamepad.ControllerManager;
 import com.studiohartman.jamepad.ControllerState;
 
@@ -33,6 +34,7 @@ public class Tab extends JPanel {
     Menu3D menu;
     GameMenu mainMenu;
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    Image stage;
     int ypos;
     int xpos;
     private final JLabel noteStreak = new JLabel("Note Streak: 0");
@@ -67,15 +69,15 @@ public class Tab extends JPanel {
         ypos = (int) screenSize.getHeight() - 75;
         xpos = (int) (screenSize.getWidth() - 300) / 2;
 
-        if(multiplayer){
+        if (multiplayer) {
             xpos /= 2;
             this.player2.setXpos(xpos * 3);
             this.player2.setYpos(ypos);
-            this.player2.addComponents(this,screenSize.width - 145);
+            this.player2.addComponents(this, screenSize.width - 145);
         }
         this.player.setXpos(xpos);
         this.player.setYpos(ypos);
-        this.player.addComponents(this,70);
+        this.player.addComponents(this, 70);
 
         KB();
         setFocusable(true);
@@ -142,22 +144,26 @@ public class Tab extends JPanel {
         //g.drawImage(gifImage, 0, 0, getWidth(), getHeight(), this);
         //g.drawImage(backGround,(int)50,170 - 100, 100, 100, this);
 
-            //int oldNoteStreak = player.noteStreak;
+        //int oldNoteStreak = player.noteStreak;
+        if (stage != null) {
+            g.drawImage(stage, 0, 0, getWidth(), getHeight(), this);
+        }
         drawLines(g, xpos, ypos);
         if (!notes.isEmpty()) {
-            paintNotes(g,notes,player);
+            paintNotes(g, notes, player);
         }
-        if(multiplayer) {
-            if(!notes2.isEmpty())
-                paintNotes(g,notes2,player2);
+        if (multiplayer) {
+            if (!notes2.isEmpty())
+                paintNotes(g, notes2, player2);
             drawLines(g, xpos, ypos);
             if (!notes.isEmpty()) {
-                paintNotes(g,notes,player);
+                paintNotes(g, notes, player);
             }
-            if(multiplayer) {
-                if(!notes2.isEmpty())
-                   paintNotes(g,notes2,player2);
+            if (multiplayer) {
+                if (!notes2.isEmpty())
+                    paintNotes(g, notes2, player2);
             }
+
             /*if (oldNoteStreak != player.noteStreak) {
                 noteStreak.setText("Note Streak: " + player.noteStreak);
             }
@@ -182,7 +188,7 @@ public class Tab extends JPanel {
 
         g.setColor(new Color(128, 128, 128, 128));
         g.fillRect(xpos - 25, 0, 400, ypos + 75);
-        if(multiplayer) {
+        if (multiplayer) {
             g.setColor(Color.BLACK);
             g.drawLine(xpos * 3 - 25, 0, xpos * 3 - 25, ypos + 75);
             g.drawLine(xpos * 3 + 25, 0, xpos * 3 + 25, ypos);
@@ -242,7 +248,7 @@ public class Tab extends JPanel {
 
         }
         if (oldNoteStreak != player.noteStreak) {
-                player.noteStreakLabel.setText("Note Streak: " + player.noteStreak);
+            player.noteStreakLabel.setText("Note Streak: " + player.noteStreak);
         }
         player.scoreLabel.setText("Score: " + player.score);
         player.multiplierLabel.setText("Multiplier: " + player.multiplier + "x");
@@ -257,28 +263,28 @@ public class Tab extends JPanel {
 
             @Override
             public void keyPressed(KeyEvent e) {
-                    switch (e.getKeyCode()) {
-                        case KeyEvent.VK_A:
-                            player.greenNote.setReleased(true);
-                            break;
-                        case KeyEvent.VK_S:
-                            player.redNote.setReleased(true);
-                            break;
-                        case KeyEvent.VK_D:
-                            player.yellowNote.setReleased(true);
-                            break;
-                        case KeyEvent.VK_F:
-                            player.blueNote.setReleased(true);
-                            break;
-                        case KeyEvent.VK_G:
-                            player.orangeNote.setReleased(true);
-                            break;
-                        case KeyEvent.VK_ESCAPE:
-                            togglePause();
-                            break;
-                    }
+                switch (e.getKeyCode()) {
+                    case KeyEvent.VK_A:
+                        player.greenNote.setReleased(true);
+                        break;
+                    case KeyEvent.VK_S:
+                        player.redNote.setReleased(true);
+                        break;
+                    case KeyEvent.VK_D:
+                        player.yellowNote.setReleased(true);
+                        break;
+                    case KeyEvent.VK_F:
+                        player.blueNote.setReleased(true);
+                        break;
+                    case KeyEvent.VK_G:
+                        player.orangeNote.setReleased(true);
+                        break;
+                    case KeyEvent.VK_ESCAPE:
+                        togglePause();
+                        break;
+                }
                 //} else if (playerNumber == 2) {
-                if(multiplayer) {
+                if (multiplayer) {
                     switch (e.getKeyCode()) {
                         case KeyEvent.VK_Y:
                             player2.greenNote.setReleased(true);
@@ -301,29 +307,29 @@ public class Tab extends JPanel {
 
             @Override
             public void keyReleased(KeyEvent e) {
-                    switch (e.getKeyCode()) {
-                        case KeyEvent.VK_A:
-                            player.greenNote.setReleased(false);
-                            player.greenNote.setClicked(true);
-                            break;
-                        case KeyEvent.VK_S:
-                            player.redNote.setReleased(false);
-                            player.redNote.setClicked(true);
-                            break;
-                        case KeyEvent.VK_D:
-                            player.yellowNote.setReleased(false);
-                            player.yellowNote.setClicked(true);
-                            break;
-                        case KeyEvent.VK_G:
-                            player.blueNote.setReleased(false);
-                            player.blueNote.setClicked(true);
-                            break;
-                        case KeyEvent.VK_H:
-                            player.orangeNote.setReleased(false);
-                            player.orangeNote.setClicked(true);
-                            break;
-                    }
-                if(multiplayer) {
+                switch (e.getKeyCode()) {
+                    case KeyEvent.VK_A:
+                        player.greenNote.setReleased(false);
+                        player.greenNote.setClicked(true);
+                        break;
+                    case KeyEvent.VK_S:
+                        player.redNote.setReleased(false);
+                        player.redNote.setClicked(true);
+                        break;
+                    case KeyEvent.VK_D:
+                        player.yellowNote.setReleased(false);
+                        player.yellowNote.setClicked(true);
+                        break;
+                    case KeyEvent.VK_F:
+                        player.blueNote.setReleased(false);
+                        player.blueNote.setClicked(true);
+                        break;
+                    case KeyEvent.VK_G:
+                        player.orangeNote.setReleased(false);
+                        player.orangeNote.setClicked(true);
+                        break;
+                }
+                if (multiplayer) {
                     switch (e.getKeyCode()) {
                         case KeyEvent.VK_Y:
                             player2.greenNote.setReleased(false);
@@ -419,7 +425,7 @@ public class Tab extends JPanel {
         ng = new NoteGenerator("Note Generator", this, selectedSong, player, xpos, ypos);
         notes = ng.getNotes();
 
-        if(multiplayer){
+        if (multiplayer) {
             ng2 = new NoteGenerator("Note Generator", this, selectedSong, player2, xpos * 3, ypos);
             notes2 = ng2.getNotes();
             ng2.start();
@@ -435,26 +441,28 @@ public class Tab extends JPanel {
     }
 
     public void playAudio() throws UnsupportedAudioFileException, LineUnavailableException, IOException {
-        String audioFilePath= "src/main/java/Resources/Songs/"+selectedSong+".wav";
+        String audioFilePath = "src/main/java/Resources/Songs/" + selectedSong + ".wav";
         File audioFile = new File(audioFilePath);
         AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
         clip = AudioSystem.getClip();
         clip.open(audioStream);
         clip.start();
     }
-     public void resumeAudio() {
+
+    public void resumeAudio() {
         clip.start();
     }
 
     public void pauseAudio() {
         clip.stop();
     }
+
     void togglePause() {
         paused = !paused;
         if (paused) {
 
             ng.pauseG();
-            if(multiplayer)
+            if (multiplayer)
                 ng2.pauseG();
             pauseAudio();
             menu = new PauseMenu();
@@ -469,12 +477,11 @@ public class Tab extends JPanel {
                     case 0:
                         togglePause();
                         break;
-                    case 1:
-                    {
+                    case 1: {
                         try {
                             gameThread.setExit(true);
                             ng.setExit(true);
-                            if(multiplayer)
+                            if (multiplayer)
                                 ng2.setExit(true);
                             this.remove(menu);
                             paused = !paused;
@@ -483,28 +490,59 @@ public class Tab extends JPanel {
                         } catch (Exception e) {
                         }
                     }
-                        break;
+                    break;
 
                     case 2:
                         paused = false;
                         gameThread.setExit(true);
-                        ng.setExit(true);
                         //player.removeComponents(this);
-                        if(multiplayer) {
+                        if (!multiplayer) {
+                            ng.setExit(true);
+                            switchToSongList(1);
+                        } else {
                             ng2.setExit(true);
+                            switchToSongList(2);
                             //player2.removeComponents(this);
+
                         }
-                        mainMenu.getSongList(multiplayer).switchSongMenu();
+
                         break;
                 }
             });
         } else {
             ng.resumeG();
-            if(multiplayer)
+            if (multiplayer)
                 ng2.resumeG();
             resumeAudio();
             this.remove(menu);
         }
     }
 
+    public void setBackgroundImage(int difficulty) {
+        String imagePath = switch (difficulty) {
+            case 1 -> "src/main/java/Resources/Stages/street.jpg";
+            case 2 -> "src/main/java/Resources/Stages/garage.jpg";
+            case 3 -> "src/main/java/Resources/Stages/little_concert.jpg";
+            case 4 -> "src/main/java/Resources/Stages/big_concert.jpg";
+            case 5 -> "src/main/java/Resources/Stages/starium.jpg";
+            default -> "";
+        };
+        System.out.println(imagePath);
+
+        ImageIcon imageIcon = new ImageIcon(imagePath);
+        if (imageIcon.getImageLoadStatus() == MediaTracker.ERRORED) {
+            System.err.println("Error: Background image not found or failed to load at " + imagePath);
+        } else {
+            stage = imageIcon.getImage();
+        }
+        repaint();
+    }
+
+    public void switchToSongList(int players) {
+        frame.getContentPane().removeAll();
+        SongList songList = new SongList(mainMenu, frame, WIDTH, HEIGHT, players);
+        frame.getContentPane().add(songList);
+        frame.revalidate();
+        frame.repaint();
+    }
 }

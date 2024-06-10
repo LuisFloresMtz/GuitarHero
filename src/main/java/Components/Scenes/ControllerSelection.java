@@ -1,5 +1,6 @@
 package Components.Scenes;
 
+import Components.Menu.GameMenu;
 import Components.SongList.SongList;
 import Utilities.Song;
 import com.studiohartman.jamepad.ControllerManager;
@@ -21,12 +22,13 @@ public class ControllerSelection extends JPanel {
     ControllerManager controllers = new ControllerManager();
     int currentGuitarSelection = 1;
     int currentKeyboardSelection = 1;
+    GameMenu gameMenu;
 
-    public ControllerSelection(JFrame frame, int WIDTH, int HEIGHT) {
+    public ControllerSelection(GameMenu gameMenu,JFrame frame, int WIDTH, int HEIGHT) {
         guitarImage = new ImageIcon("src/main/java/resources/Images/Guitar.png");
         keyboardImage = new ImageIcon("src/main/java/resources/Images/Keyboard.png");
         ControllerManager controllers = new ControllerManager();
-
+        this.gameMenu = gameMenu;
         int pos0 = (WIDTH / 3) - 200;
         int pos1 = (WIDTH / 2) - 200;
         int pos2 = (2 * WIDTH / 3) - 200;
@@ -179,7 +181,7 @@ public class ControllerSelection extends JPanel {
                     }
 
                     frame.getContentPane().removeAll();
-                    frame.add(new SongList(frame, songs, getWidth(), getHeight(), 2, controllers));
+                    frame.add(new SongList(gameMenu ,frame, getWidth(), getHeight(), 2));
                     frame.revalidate();
                     frame.repaint();
                 }

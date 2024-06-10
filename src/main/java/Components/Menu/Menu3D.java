@@ -10,6 +10,7 @@ import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JComponent;
@@ -22,6 +23,9 @@ public class Menu3D extends JComponent {
     private final int left = 60;
     private int pressedIndex = 0;
     private final int menuHeight = 50;
+    private ControllerManager controllers;
+    private boolean initialized = false;
+    private volatile boolean running = true;
 
     public Menu3D() {
         setFocusable(true);
@@ -35,25 +39,33 @@ public class Menu3D extends JComponent {
             }
         });
 
-        ControllerManager controllers = new ControllerManager();
-        controllers.initSDLGamepad();
-
         new Thread(() -> {
-            while (true) {
-                ControllerState currState = controllers.getState(0); // 0 is the index of the first controller
+            try {
+                controllers = new ControllerManager();
+                controllers.initSDLGamepad();
+                initialized = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+                initialized = false;
+            }
 
-                if (currState.isConnected) {
-                    if (currState.dpadUpJustPressed) {
-                        handleInput(KeyEvent.VK_UP);
-                    }
-                    if (currState.dpadDownJustPressed) {
-                        handleInput(KeyEvent.VK_DOWN);
-                    }
-                    if (currState.startJustPressed) {
-                        handleInput(KeyEvent.VK_ENTER);
-                    }
-                    if (currState.aJustPressed) {
-                        handleInput(KeyEvent.VK_ENTER);
+            while (running) {
+                if (initialized) {
+                    ControllerState currState = controllers.getState(0); // 0 is the index of the first controller
+
+                    if (currState.isConnected) {
+                        if (currState.dpadUpJustPressed) {
+                            handleInput(KeyEvent.VK_UP);
+                        }
+                        if (currState.dpadDownJustPressed) {
+                            handleInput(KeyEvent.VK_DOWN);
+                        }
+                        if (currState.startJustPressed) {
+                            handleInput(KeyEvent.VK_ENTER);
+                        }
+                        if (currState.aJustPressed) {
+                            handleInput(KeyEvent.VK_ENTER);
+                        }
                     }
                 }
 
@@ -90,8 +102,6 @@ public class Menu3D extends JComponent {
                 break;
         }
     }
-
-
 
     private void init() {
         setForeground(new Color(238, 238, 238));
@@ -156,9 +166,16 @@ public class Menu3D extends JComponent {
     public int getMenuHeight() {
         return menuHeight;
     }
+
     public int getPressedIndex() {
         return pressedIndex;
     }
 
-
+    public void cleanup() {
+        KeyListener[] keyListeners = this.getKeyListeners();
+        for (KeyListener keyListener : keyListeners) {
+            this.removeKeyListener(keyListener);
+        }
+        running = false; // Detener el hilo del controlador
+    }
 }
