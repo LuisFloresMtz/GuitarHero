@@ -37,7 +37,7 @@ public class Server {
         DatagramSocket finalS = s;
         new Thread(() -> {
             try {
-                SongList songList = new SongList(gameMenu, frame, 800, 600, 1);
+                SongList songList = new SongList(gameMenu, frame, frame.getWidth(), frame.getHeight(), 1);
                 selectedSong = songList.getSelectedSong();
 
                 while (true) {

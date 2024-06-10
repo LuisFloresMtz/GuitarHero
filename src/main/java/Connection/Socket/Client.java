@@ -2,12 +2,13 @@ package Connection.Socket;
 
 import Components.Menu.GameMenu;
 import Components.Scenes.OnePlayerScene;
+import Utilities.Button;
 import Utilities.Song;
 
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
-import java.awt.*;
+
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -18,9 +19,11 @@ import java.io.ObjectInputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import Components.TextField.TextField;
+import java.awt.*;
 
 public class Client extends JPanel {
-    int PUERTO_DEL_CLIENTE = 5001;
+    int PUERTO_DEL_CLIENTE = 5000;
     int PUERTO_DEL_SERVIDOR = 5000;
     TextField server;
     Button connect;
