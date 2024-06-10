@@ -22,17 +22,22 @@ import java.net.*;
 import java.util.Timer;
 import java.util.TimerTask;
 
+
 public class Client extends JPanel {
+    int PUERTO_DEL_CLIENTE;
+    int PUERTO_DEL_SERVIDOR;
     TextField server;
     Button connect;
     String ip;
-    Socket socket;
-    ObjectOutputStream out;
-    ObjectInputStream in;
+    DatagramSocket dgSocket;
+    DatagramPacket datagram;
+    InetAddress destination = null;
     JLabel imageLabel;
     GameMenu gameMenu;
 
+
     public Client(GameMenu gameMenu, JFrame frame, int WIDTH, int HEIGHT) {
+        PUERTO_DEL_CLIENTE = PUERTO_DEL_SERVIDOR = 5000;
         frame.setCursor(Cursor.getDefaultCursor());
         setBackground(new Color(43, 45, 48));
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -78,9 +83,7 @@ public class Client extends JPanel {
         connect.addActionListener(e -> {
             try {
                 handleConnection(frame);
-            } catch (UnknownHostException ex) {
-                throw new RuntimeException(ex);
-            } catch (SocketException ex) {
+            } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
         });
@@ -111,45 +114,50 @@ public class Client extends JPanel {
     }
 
 
-    private void handleConnection(JFrame frame) throws UnknownHostException, SocketException {
-        DatagramSocket dgSocket;
-        InetAddress destination;
-
-        // Configuración del socket y dirección de destino
-        dgSocket = new DatagramSocket(5000, InetAddress.getByName(ip));
-        destination = InetAddress.getByName(ip);
-
-        System.out.println("Cliente UDP activo, enviando mensajes al servidor...");
-
-        Timer timer = new Timer();
-        InetAddress finalDestination = destination;
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
-                try {
-                    // Crear y enviar el mensaje
-                    String saludo = "hola" + "\0";
-                    byte[] msg = saludo.getBytes();
-                    DatagramPacket datagram = new DatagramPacket(msg, msg.length, finalDestination, 5000);
-                    dgSocket.send(datagram);
-                    System.out.println("Dato enviado");
-
-                    // Recibir la respuesta del servidor
-                    byte[] msgR = new byte[1024];
-                    datagram = new DatagramPacket(msgR, msgR.length);
-                    dgSocket.receive(datagram);
-                    String received = new String(datagram.getData()).split("\0")[0];
-                    System.out.println("DATOS DEL DATAGRAMA: " + received);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+    private void handleConnection(JFrame frame) throws Exception {
+        new Thread(() -> {
+            String saludo = new String("hola" + "\0");
+            byte msg[] = saludo.getBytes();
+            try {
+                dgSocket = new DatagramSocket(
+                        PUERTO_DEL_CLIENTE,
+                        InetAddress.getByName(ip));
+            } catch (Exception e) {
+                System.out.println(e.getMessage());;
             }
-        };
+            try {
+                destination = InetAddress.getByName(
+                        ip);
+            } catch (UnknownHostException uhe) {
+                System.err.println("Host no encontrado : " + uhe);
+                System.exit(-1);
+            }
+            byte msgR[] = new byte[1024];
+            try{
+            datagram = new DatagramPacket(msg, msg.length,
+                    destination,
+                    PUERTO_DEL_SERVIDOR);
+            dgSocket.send(datagram);
+            System.out.println("Dato enviado");
+            datagram = new DatagramPacket(msgR, msgR.length);
+            dgSocket.receive(datagram);
+            String received = new String(datagram.getData());
+            received = received.split("\0")[0];
+            System.out.println("DATOS DEL DATAGRAMA: "
+                    + received);
+            }catch (Exception e){e.printStackTrace();}
+            dgSocket.close();
+            try {
 
-        // Programar la tarea para que se ejecute cada 500 ms
-        timer.scheduleAtFixedRate(task, 0, 500);
+                Thread.sleep(500);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+
     }
-
 }
 
 

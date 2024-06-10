@@ -1,24 +1,17 @@
 package Connection.Socket;
 
 import Components.Menu.GameMenu;
-import Components.Scenes.TwoPlayerScene;
-import Components.SongList.SongList;
-import Utilities.Song;
 import com.studiohartman.jamepad.ControllerManager;
 
-import javax.imageio.ImageIO;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.Date;
+import java.io.IOException;
 
 public class Server {
     ServerSocket serverSocket;
@@ -34,8 +27,6 @@ public class Server {
         controllers = new ControllerManager();
         this.gameMenu = gameMenu;
         handleConnection(frame);
-
-
     }
 
     private void handleConnection(JFrame frame) {
@@ -47,28 +38,27 @@ public class Server {
             return;
         }
 
-        System.out.println("Servidor Activo. Esperando conexiones...");
-
+        System.out.println("Servidor UDP activo. Esperando conexiones...");
 
         DatagramSocket finalS = s;
-
         new Thread(() -> {
             try {
                 while (true) {
                     DatagramPacket recibido = new DatagramPacket(new byte[1024], 1024);
-                    System.out.println("Esperando...");
+                    System.out.println("Esperando mensaje...");
                     finalS.receive(recibido);
-                    System.out.println("Ha llegado una petición \n");
-                    System.out.println("Procedente de :" + recibido.getAddress());
-                    System.out.println("En el puerto :" + recibido.getPort());
+                    System.out.println("Ha llegado una petición");
+                    System.out.println("Procedente de: " + recibido.getAddress());
+                    System.out.println("En el puerto: " + recibido.getPort());
+
                     String dato = new String(recibido.getData()).split("\0")[0];
-                    System.out.println("Dato: " + dato);
-                    System.out.println("Sirviendo la petición");
+                    System.out.println("Dato recibido: " + dato);
 
                     String message = "HORA DEL SERVIDOR " + new Date() + "\0";
                     byte[] msg = message.getBytes();
                     DatagramPacket paquete = new DatagramPacket(msg, msg.length, recibido.getAddress(), recibido.getPort());
                     finalS.send(paquete);
+                    System.out.println("Respuesta enviada");
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -84,7 +74,4 @@ public class Server {
             }
         }
     }
-
 }
-
-
