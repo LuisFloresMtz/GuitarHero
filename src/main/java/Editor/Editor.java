@@ -1,7 +1,7 @@
 package Editor;
 
 import Player.*;
-import Scenes.Menu.GameMenu;
+import Components.Menu.GameMenu;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
