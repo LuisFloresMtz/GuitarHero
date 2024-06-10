@@ -55,7 +55,8 @@ public class Tab extends JPanel {
     static boolean multiplayer;
     boolean exit;
     GameThread gameThread;
-
+    public volatile boolean running = true;
+    ControllerManager controllers = new ControllerManager();
 
     public Tab(GameMenu mainMenu, Player player, Player player2, Song song, JFrame frame) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
         setLayout(new GridLayout(1, 1));
@@ -87,7 +88,7 @@ public class Tab extends JPanel {
         this.frame = frame;
         /*try {
             backGround = ImageIO.read(new File("/C:/Users/Diego/Downloads/video.gif/"));
-        } catch (IOException e) {  
+        } catch (IOException e) {
             System.exit(1);
         }
         //notesInScreen = new CopyOnWriteArrayList<>();*/
@@ -258,6 +259,8 @@ public class Tab extends JPanel {
     }
 
     public void KB() {
+
+
         KeyListener kb = new KeyListener() {
             @Override
             public void keyTyped(KeyEvent e) {
@@ -359,33 +362,7 @@ public class Tab extends JPanel {
         };
         this.addKeyListener(kb);
 
-        ControllerManager controllers = new ControllerManager();
-        controllers.initSDLGamepad();
 
-        new Thread(() -> {
-            while (true) {
-                ControllerState currState = controllers.getState(0);
-                if (currState.isConnected) {
-                    if (player.playerNumber == 1) {
-                        handleControllerInput(currState, player.greenNote, player.redNote, player.yellowNote, player.blueNote, player.orangeNote);
-                        if (currState.startJustPressed) {
-                            togglePause();
-                        }
-                    } else if (player.playerNumber == 2) {
-                        handleControllerInput(currState, player.greenNote, player.redNote, player.yellowNote, player.blueNote, player.orangeNote);
-                        if (currState.startJustPressed) {
-                            togglePause();
-                        }
-                    }
-                }
-
-                try {
-                    Thread.sleep(50); // Sleep to avoid flooding the console
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
     }
 
     private void handleControllerInput(ControllerState currState, PlayerNote greenNote, PlayerNote redNote, PlayerNote yellowNote, PlayerNote blueNote, PlayerNote orangeNote) {
@@ -474,6 +451,7 @@ public class Tab extends JPanel {
             this.add(menu);
             this.repaint();
 
+
             menu.addEvent(index -> {
                 switch (index) {
                     case 0:
@@ -500,10 +478,15 @@ public class Tab extends JPanel {
                         //player.removeComponents(this);
                         if (!multiplayer) {
                             ng.setExit(true);
-                            switchToSongList(1);
+                            controllers.quitSDLGamepad();
+                            running = false;
+                            switchToGameMenu(mainMenu);
+
                         } else {
+                            running = false;
                             ng2.setExit(true);
-                            switchToSongList(2);
+                            controllers.quitSDLGamepad();
+                            switchToGameMenu(mainMenu);
                             //player2.removeComponents(this);
 
                         }
@@ -540,11 +523,12 @@ public class Tab extends JPanel {
         repaint();
     }
 
-    public void switchToSongList(int players) {
+    public void switchToGameMenu(GameMenu mainMenu) {
         frame.getContentPane().removeAll();
-        SongList songList = new SongList(mainMenu, frame, WIDTH, HEIGHT, players);
-        frame.getContentPane().add(songList);
+        frame.add(mainMenu);
+        mainMenu.resetMenu(frame);
         frame.revalidate();
         frame.repaint();
+
     }
 }

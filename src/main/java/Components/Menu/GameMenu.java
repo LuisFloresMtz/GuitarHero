@@ -5,10 +5,13 @@ import Components.SongList.SongList;
 import Connection.Socket.Client;
 import Components.Scenes.ControllerSelection;
 import Utilities.Song;
+import com.studiohartman.jamepad.ControllerManager;
+import com.studiohartman.jamepad.ControllerState;
 import jnafilechooser.api.JnaFileChooser;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -32,6 +35,8 @@ public class GameMenu extends JPanel {
     private ArrayList<Song> songs = new ArrayList<>();
     private SongList songList;
     private Clip clip;
+    private ControllerManager controllers;
+    private volatile boolean running = true;
 
     public GameMenu(JFrame frame, int WIDTH, int HEIGHT) {
 
@@ -42,13 +47,18 @@ public class GameMenu extends JPanel {
         setLayout(null);
         setBackground(new Color(43, 45, 48));
         panelWidth = frame.getWidth() / 4;
+        controllers = new ControllerManager();
+        controllers.initSDLGamepad();
+
 
         menu = new Menu3D();
         menu.addMenuItem("Un jugador");
         menu.addMenuItem("Dos jugadores");
         menu.addMenuItem("En linea");
+        menu.addMenuItem("Vs. CPU");
         menu.addMenuItem("Editar");
-        menu.addMenuItem("Cerrar");
+        menu.addMenuItem("Configuración");
+        menu.addMenuItem("Salir");
 
         int menuHeight = menu.getItemsSize() * menu.getMenuHeight() + 75;
         int menuWidth = WIDTH / 3;
@@ -67,14 +77,23 @@ public class GameMenu extends JPanel {
                     switchToOnline(frame);
                     break;
                 case 3:
-                    switchToEdit(frame);
+                    //switch
                     break;
                 case 4:
+                    switchToEdit(frame);
+                    break;
+                case 5:
+                    switchToSettings(frame);
+                    break;
+                case 6:
                     System.exit(0);
                     break;
             }
         });
         add(menu);
+        if (controllers.getNumControllers() != 0){
+        startControllerListener();
+        }
         try {
             playAudio();
         } catch (Exception e) {
@@ -88,6 +107,7 @@ public class GameMenu extends JPanel {
 
     private void switchToOnePlayerScene(JFrame frame) {
         try {
+            controllers.quitSDLGamepad();
             songList = new SongList(this, frame, WIDTH, HEIGHT, 1);
             frame.getContentPane().removeAll();
             frame.add(songList);
@@ -101,6 +121,7 @@ public class GameMenu extends JPanel {
 
     private void switchToTwoPlayerScene(JFrame frame) {
         try {
+            controllers.quitSDLGamepad();
             frame.getContentPane().removeAll();
             songList = new SongList(this, frame, WIDTH, HEIGHT, 2);
             frame.add(songList);
@@ -145,4 +166,52 @@ public class GameMenu extends JPanel {
         frame.revalidate();
         frame.repaint();
     }
+
+    public void switchToSettings(JFrame frame) {
+        Settings settings = new Settings(this, frame, getWidth(), getHeight());
+        frame.getContentPane().removeAll();
+        frame.add(settings);
+        frame.revalidate();
+        frame.repaint();
+    }
+
+    private void startControllerListener() {
+        new Thread(() -> {
+            while (running) {
+                ControllerState currState = controllers.getState(0);
+                if (currState.isConnected) {
+                    if (currState.dpadUpJustPressed) {
+                        if (menu.pressedIndex > 0) {
+                            menu.pressedIndex--;
+                            menu.repaint();
+                        }
+                    }
+                    if (currState.dpadDownJustPressed) {
+                        if (menu.pressedIndex < menu.items.size() - 1) {
+                            menu.pressedIndex++;
+                            menu.repaint();
+                        }
+                    }
+                    if (currState.startJustPressed || currState.aJustPressed) {
+                        if (menu.pressedIndex != -1) {
+                            running = false;
+                            menu.items.get(menu.pressedIndex).getAnimator().show();
+                            menu.hideMenu(menu.pressedIndex);
+                            menu.runEvent();
+                        }
+                    }
+                }
+                try {
+                    Thread.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    public void setRunning(Boolean running) {
+        this.running = running;
+    }
+
 }
