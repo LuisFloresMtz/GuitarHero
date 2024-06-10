@@ -4,6 +4,7 @@ import Components.Menu.GameMenu;
 import Components.Menu.Menu3D;
 import Components.Menu.PauseMenu;
 import Components.SongList.SongList;
+import Utilities.Song;
 import com.studiohartman.jamepad.ControllerManager;
 import com.studiohartman.jamepad.ControllerState;
 
@@ -34,7 +35,7 @@ public class Tab extends JPanel {
     Menu3D menu;
     GameMenu mainMenu;
     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-    Image stage;
+    ImageIcon stage;
     int ypos;
     int xpos;
     private final JLabel noteStreak = new JLabel("Note Streak: 0");
@@ -48,8 +49,6 @@ public class Tab extends JPanel {
     private boolean paused = false;
     long elapsedTime;
     long dt;
-    Image backGround;
-    ImageIcon gifIcon;
     String selectedSong;
     static boolean multiplayer;
     static boolean vsCPU = true;
@@ -59,13 +58,14 @@ public class Tab extends JPanel {
     static int presition = 1;
 
 
-    public Tab(GameMenu mainMenu, Player player, Player player2, String selectedSong, JFrame frame) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
+    public Tab(GameMenu mainMenu, Player player, Player player2, Song song, JFrame frame) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
         setLayout(new GridLayout(1, 1));
         setSize(new Dimension((int) screenSize.getWidth(), (int) screenSize.getHeight()));
+        setBackgroundImage(song.getDifficulty());
         this.player = player;
         this.player2 = player2;
         this.mainMenu = mainMenu;
-        this.selectedSong = selectedSong;
+        this.selectedSong = song.getName();
         this.exit = false;
         setLayout(null);
         setPreferredSize(new Dimension((int) (screenSize.getWidth()), (int) screenSize.getHeight()));
@@ -76,26 +76,16 @@ public class Tab extends JPanel {
             xpos /= 2;
             this.player2.setXpos(xpos * 3);
             this.player2.setYpos(ypos);
-            this.player2.addComponents(this, screenSize.width - 145);
+            this.player2.addComponents(this, screenSize.width - 185);
         }
         this.player.setXpos(xpos);
         this.player.setYpos(ypos);
-        this.player.addComponents(this, 70);
+        this.player.addComponents(this, 35);
 
         KB();
         setFocusable(true);
-        JLabel gifLabel;
         this.frame = frame;
-        /*try {
-            backGround = ImageIO.read(new File("/C:/Users/Diego/Downloads/video.gif/"));
-        } catch (IOException e) {  
-            System.exit(1);
-        }
-        //notesInScreen = new CopyOnWriteArrayList<>();*/
-        //gifIcon = new ImageIcon("src/main/java/Resources/BackGrounds/Ella_y_yo.gif/");
-        /*gifLabel = new JLabel(gifIcon);
-        /*gifLabel.setBounds(0, 0, (int)screenSize.getWidth(), (int)screenSize.getHeight());
-        add(gifLabel);*/
+        
     }
 
     //Setters
@@ -138,18 +128,9 @@ public class Tab extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        /*Graphics2D g2d = (Graphics2D) g.create();
-        g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.8f));
-        Image gifImage = gifIcon.getImage();
-        g2d.drawImage(gifImage, 0, 0, getWidth(), getHeight(), this);
-        g2d.dispose();*/
-        //Image gifImage = gifIcon.getImage();
-        //g.drawImage(gifImage, 0, 0, getWidth(), getHeight(), this);
-        //g.drawImage(backGround,(int)50,170 - 100, 100, 100, this);
-
-        //int oldNoteStreak = player.noteStreak;
         if (stage != null) {
-            g.drawImage(stage, 0, 0, getWidth(), getHeight(), this);
+            Image stageImage = stage.getImage();
+            g.drawImage(stageImage, 0, 0, getWidth(), getHeight(), this);
         }
         drawLines(g, xpos, ypos);
         if (!notes.isEmpty()) {
@@ -177,8 +158,8 @@ public class Tab extends JPanel {
     }
 
     private void drawLines(Graphics g, int xpos, int ypos) {
-        g.setColor(Color.DARK_GRAY);
-        g.fillRect(0, 0, getWidth(), getHeight());
+        //g.setColor(Color.DARK_GRAY);
+        //g.fillRect(0, 0, getWidth(), getHeight());
 
         g.setColor(Color.BLACK);
         g.drawLine(xpos - 25, 0, xpos - 25, ypos + 75);
@@ -588,11 +569,12 @@ public class Tab extends JPanel {
 
     public void setBackgroundImage(int difficulty) {
         String imagePath = switch (difficulty) {
+            case 0 -> "src/main/java/Resources/Stages/small_concert.gif/";
             case 1 -> "src/main/java/Resources/Stages/street.jpg";
             case 2 -> "src/main/java/Resources/Stages/garage.jpg";
-            case 3 -> "src/main/java/Resources/Stages/little_concert.jpg";
+            case 3 -> "src/main/java/Resources/Stages/little_concert.png";
             case 4 -> "src/main/java/Resources/Stages/big_concert.jpg";
-            case 5 -> "src/main/java/Resources/Stages/starium.jpg";
+            case 5 -> "src/main/java/Resources/Stages/stadium.jpg";
             default -> "";
         };
         System.out.println(imagePath);
@@ -601,7 +583,7 @@ public class Tab extends JPanel {
         if (imageIcon.getImageLoadStatus() == MediaTracker.ERRORED) {
             System.err.println("Error: Background image not found or failed to load at " + imagePath);
         } else {
-            stage = imageIcon.getImage();
+            stage = imageIcon;
         }
         repaint();
     }

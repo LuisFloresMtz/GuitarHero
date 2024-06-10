@@ -5,6 +5,7 @@ import Components.Menu.GameMenu;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -58,6 +59,8 @@ public class Editor extends JPanel{
     JButton backward;
     JButton forward;
     JButton save;
+    JLabel timeLabel;
+    JLabel durationLabel;
     SongPropierties propiertiesPanel;
     String songPath;
     Clip clip;
@@ -99,7 +102,7 @@ public class Editor extends JPanel{
         notes = new CopyOnWriteArrayList<>();
         frame.setCursor(Cursor.getDefaultCursor());
         returnButton = new JButton("Regresar");
-        songPropierties = new JButton("Propiedades");
+        songPropierties = new JButton("Info");
         addSongButton = new JButton("Seleccionar Audio");
         remove = new JButton("Remover");
         removeAll = new JButton("Remover Todo");
@@ -180,6 +183,18 @@ public class Editor extends JPanel{
         });
         add(save);
         
+        durationLabel = new JLabel("Duracion: ");
+        durationLabel.setBounds(width - 300, 50 ,300,100);
+        durationLabel.setFont(new Font("Verdana", Font.BOLD, 18));
+        durationLabel.setForeground(new Color(255, 255, 255)); 
+        durationLabel.setOpaque(false);
+        add(durationLabel);
+        timeLabel = new JLabel("Transcurrido: ");
+        timeLabel.setBounds(width - 300, 100 ,300,100);
+        timeLabel.setFont(new Font("Verdana", Font.BOLD, 18));
+        timeLabel.setForeground(new Color(255, 255, 255)); 
+        timeLabel.setOpaque(false);
+        add(timeLabel);
         initRetButton();
         initSongButton();
         initPropButton();
@@ -477,21 +492,35 @@ public class Editor extends JPanel{
     }
     
     public void hover(JButton button) {
+ 
+        button.setFont(new Font("Verdana", Font.BOLD, 18));
+        button.setForeground(new Color(255, 255, 255));
+
+        button.setBackground(Color.GRAY);
+        button.setOpaque(true);
+        button.setBorderPainted(false);
+        button.setBorder(BorderFactory.createLineBorder(new Color(255, 255, 255), 2));
         button.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                button.setBackground(new Color(47, 127, 255));
+                button.setBackground(new Color(30, 144, 255));
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
                 button.setBackground(Color.GRAY);
             }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                button.setBackground(new Color(0, 76, 153));
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                button.setBackground(new Color(30, 144, 255)); 
+            }
         });
-        button.setBackground(Color.GRAY); 
-        button.setForeground(new Color(238, 238, 238));
-        button.setBorderPainted(false);
-        button.setFocusPainted(false);
     }
     
     public void selectAudio() throws UnsupportedAudioFileException, LineUnavailableException, IOException {
@@ -508,6 +537,9 @@ public class Editor extends JPanel{
                         AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
                         clip = AudioSystem.getClip();
                         clip.open(audioStream);
+                        long duration = clip.getMicrosecondLength() /1000000;
+                        durationLabel.setText("Duracion: " + duration + "s");
+
                     }
                 } else {
                     JOptionPane.showMessageDialog(null, "Please select a WAV file.", "Invalid File Type", JOptionPane.ERROR_MESSAGE);
@@ -571,11 +603,12 @@ public class Editor extends JPanel{
                     loopStartTime = System.nanoTime();
                     elapsedTime = (System.nanoTime() - startTime)/1000000;
                     if (!paused) {
+                        timeLabel.setText("Transcurrido: " + elapsedTime/1000f + "s" );
                         for (GameNote element : notes) {
                             if(!element.isInScreen()) { 
-                                if (elapsedTime >= element.getTime() - dt) //{
+                                if (elapsedTime >= element.getTime() - dt) 
                                     element.setInScreen(true);
-                                    //if(element.isInScreen()) {
+                                    
                             } else {
                                 element.physics(ypos, dt);
                                 if (skip) {

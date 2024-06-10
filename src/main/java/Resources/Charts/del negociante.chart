@@ -2,9 +2,9 @@
 {
   Name = "DEL Negociante"
   Artist = "Los Plebes del Rancho"
-  Difficulty = 0
+  Difficulty = 4
   Genre = "Corrido"
-  Players = 1
+  Players = 4
 }
 
 [Player]

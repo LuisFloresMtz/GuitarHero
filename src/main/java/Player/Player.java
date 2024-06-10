@@ -1,6 +1,7 @@
 package Player;
 
 import java.awt.Color;
+import java.awt.Font;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
@@ -69,14 +70,18 @@ public class Player {
     }
 
     public void addComponents(Tab tab, int x) {
-        noteStreakLabel.setBounds(x, 15, 100, 15);
+        noteStreakLabel.setBounds(x, 15, 175, 50);
         noteStreakLabel.setForeground(Color.WHITE);
-        multiplierLabel.setBounds(x, 30, 100, 15);
+        labelDesign(noteStreakLabel);
+        multiplierLabel.setBounds(x, 65, 175, 50);
         multiplierLabel.setForeground(Color.WHITE);
-        scoreLabel.setBounds(x, 45, 100, 15);
+        labelDesign(multiplierLabel);
+        scoreLabel.setBounds(x, 115, 175, 50);
         scoreLabel.setForeground(Color.WHITE);
-        lifeLabel.setBounds(x, 60, 100, 15);
+        labelDesign(scoreLabel);
+        lifeLabel.setBounds(x, 165, 175, 50);
         lifeLabel.setForeground(Color.WHITE);
+        labelDesign(lifeLabel);
         greenNote.setBounds(xpos, ypos, 50, 35);
         redNote.setBounds(xpos + 75, ypos, 50, 35);
         yellowNote.setBounds(xpos + 150, ypos, 50, 35);
@@ -91,6 +96,15 @@ public class Player {
         tab.add(yellowNote);
         tab.add(blueNote);
         tab.add(orangeNote);
+    }
+    
+    public void labelDesign(JLabel label) {
+        label.setFont(new Font("Verdana", Font.BOLD, 18));
+        label.setForeground(new Color(255, 255, 255));
+        label.setBackground(new Color(34, 34, 34));
+        label.setOpaque(true);
+        label.setBorder(BorderFactory.createLineBorder((new Color(47, 127, 255)), 2));
+        label.setHorizontalAlignment(SwingConstants.CENTER);
     }
     
     public void removeComponents(Tab tab) {

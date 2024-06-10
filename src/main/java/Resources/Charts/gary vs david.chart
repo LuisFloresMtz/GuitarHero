@@ -2,7 +2,7 @@
 {
   Name = "Gary vs David"
   Artist = "Regular Show"
-  Difficulty = 0
+  Difficulty = 3
   Genre = "Electronica"
   Players = 2
 }

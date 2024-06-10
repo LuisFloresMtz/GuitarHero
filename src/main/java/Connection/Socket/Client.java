@@ -115,7 +115,6 @@ public class Client extends JPanel {
 
                 out.writeObject("CONNECTION_OK");
                 out.flush();
-                
 
                 handleScreenCapture(frame);
 

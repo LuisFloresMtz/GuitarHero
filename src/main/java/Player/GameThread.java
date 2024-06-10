@@ -48,17 +48,13 @@ public class GameThread extends Thread {
     @Override
     public void run() {
         while (!exit) {
-            //if (!paused) {
-                //tab.draw();
-                tab.repaint();
+            tab.repaint();
                 try {
                     TimeUnit.NANOSECONDS.sleep(1000);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
             }
-        //}
-        System.out.println("GAME TRHEAD FINALIZADO");
     }
 
 }

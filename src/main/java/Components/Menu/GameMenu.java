@@ -48,6 +48,7 @@ public class GameMenu extends JPanel {
         menu.addMenuItem("Dos jugadores");
         menu.addMenuItem("En linea");
         menu.addMenuItem("Editar");
+        menu.addMenuItem("Configuracion");
         menu.addMenuItem("Cerrar");
 
         int menuHeight = menu.getItemsSize() * menu.getMenuHeight() + 75;
@@ -70,6 +71,9 @@ public class GameMenu extends JPanel {
                     switchToEdit(frame);
                     break;
                 case 4:
+                    switchToSettings(frame);
+                    break;
+                case 5:
                     System.exit(0);
                     break;
             }
@@ -88,14 +92,11 @@ public class GameMenu extends JPanel {
 
     private void switchToOnePlayerScene(JFrame frame) {
         try {
-
             songList = new SongList(this, frame, WIDTH, HEIGHT, 1);
             frame.getContentPane().removeAll();
             frame.add(songList);
             frame.revalidate();
             frame.repaint();
-            //menu.cleanup();
-            //menu = null;
 
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -104,28 +105,18 @@ public class GameMenu extends JPanel {
 
     private void switchToTwoPlayerScene(JFrame frame) {
         try {
-            ControllerSelection controllerSelection = new ControllerSelection(this, frame, getWidth(), getHeight());
-
-            // ControllerState check moved to Menu3D
-
-
             frame.getContentPane().removeAll();
             songList = new SongList(this, frame, WIDTH, HEIGHT, 2);
             frame.add(songList);
             frame.revalidate();
-            frame.repaint();
-            //menu.cleanup();
-            //menu = null;
-
         } catch (Exception ex) {
             ex.printStackTrace();
-            frame.getContentPane().removeAll();
-            frame.add(new SongList(this, frame, getWidth(), getHeight(), 2));
-            frame.revalidate();
-            frame.repaint();
         }
     }
-
+    
+    private void switchToSettings(JFrame frame) {
+        
+    }
 
     private void switchToEdit(JFrame frame) {
         Editor editor = new Editor(frame, this);
@@ -158,7 +149,5 @@ public class GameMenu extends JPanel {
         frame.add(client);
         frame.revalidate();
         frame.repaint();
-        menu.cleanup();
-        menu = null;
     }
 }

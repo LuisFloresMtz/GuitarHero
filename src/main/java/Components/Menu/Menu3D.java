@@ -26,6 +26,7 @@ public class Menu3D extends JComponent {
     private ControllerManager controllers;
     private boolean initialized = false;
     private volatile boolean running = true;
+    private Thread controllerThread;
 
     public Menu3D() {
         setFocusable(true);
@@ -39,7 +40,7 @@ public class Menu3D extends JComponent {
             }
         });
 
-        new Thread(() -> {
+        controllerThread = new Thread(() -> {
             try {
                 controllers = new ControllerManager();
                 controllers.initSDLGamepad();
@@ -75,8 +76,11 @@ public class Menu3D extends JComponent {
                     e.printStackTrace();
                 }
             }
-        }).start();
+        });
+
+        controllerThread.start();
     }
+
 
     public void handleInput(int keyCode) {
         switch (keyCode) {
@@ -176,6 +180,10 @@ public class Menu3D extends JComponent {
         for (KeyListener keyListener : keyListeners) {
             this.removeKeyListener(keyListener);
         }
-        running = false; // Detener el hilo del controlador
+        try {
+            controllerThread.join();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
