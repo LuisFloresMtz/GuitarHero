@@ -272,27 +272,25 @@ public class Editor extends JPanel{
                         case KeyEvent.VK_A:
                             greenNote.setReleased(true);
                             notes.add(new GameNote(xpos, ypos, new Color(54, 58, 59), new Color(8, 200, 3), (int) elapsedTime,0));
-                            System.out.println("Nota verde añadida en " + elapsedTime);
+                            
                             break;
                         case KeyEvent.VK_S:
                             redNote.setReleased(true);
                             notes.add(new GameNote(xpos + 75,ypos,  new Color(54, 58, 59), new Color(163, 24, 24), (int) elapsedTime,1));
-                            System.out.println("Nota roja añadida en " + elapsedTime);
                             break;
                         case KeyEvent.VK_D:
                             yellowNote.setReleased(true);
                             notes.add(new GameNote(xpos + 150, ypos,  new Color(54, 58, 59), new Color(254, 254, 53), (int) elapsedTime,2));
-                            System.out.println("Nota amarilla añadida en " + elapsedTime);
                             break;
                         case KeyEvent.VK_G:
                             blueNote.setReleased(true);
                             notes.add(new GameNote(xpos + 225, ypos, new Color(54, 58, 59), new Color(63, 162, 211), (int) elapsedTime,3));
-                            System.out.println("Nota azul añadida en " + elapsedTime);
+                            
                             break;
                         case KeyEvent.VK_H:
                             orangeNote.setReleased(true);
                             notes.add(new GameNote(xpos + 300, ypos, new Color(54, 58, 59), new Color(217, 147, 53), (int) elapsedTime,4));
-                            System.out.println("Nota naranja añadida en " + elapsedTime);
+                            
                             break;
                     }
             }

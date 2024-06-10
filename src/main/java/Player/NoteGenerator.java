@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 public class NoteGenerator extends Thread {
     final ArrayList<GameNote> notes;
-    JPanel panel;
+    Tab tab;
     Player player;
     int ypos;
     int xpos;
@@ -23,9 +23,9 @@ public class NoteGenerator extends Thread {
     long pausePosition;
     boolean exit;
     boolean paused;
-    public NoteGenerator(String name, JPanel panel, String selectedSong, Player player, int x, int y) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
+    public NoteGenerator(String name, Tab tab, String selectedSong, Player player, int x, int y) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
         super(name);
-        this.panel = panel;
+        this.tab = tab;
         this.player = player;
         notes = new ArrayList<>();
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -127,7 +127,7 @@ public class NoteGenerator extends Thread {
         long loopEndTime;
         long loopDuration;
         long sleepTime;
-        while(!exit) {
+        while(!exit && elapsedTime < tab.getSongDuration() ) {
             loopStartTime = System.nanoTime();
             elapsedTime = (System.nanoTime() - startTime)/1000000;
             
@@ -155,6 +155,9 @@ public class NoteGenerator extends Thread {
                 throw new RuntimeException(e);
             }
         }
-        System.out.println("NOTEGENERATOR FINALIZADO");
+        System.out.println("saliendo");
+        tab.exit = true;
+        tab.gameThread.setExit(true);
+        tab.switchToGameMenu(tab.mainMenu);
     }
 }

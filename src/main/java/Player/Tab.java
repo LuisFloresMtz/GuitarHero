@@ -57,6 +57,7 @@ public class Tab extends JPanel {
     GameThread gameThread;
     boolean shouldPress;
     public volatile boolean running = true;
+    long songDuration;
     ControllerManager controllers = new ControllerManager();
 
     public Tab(GameMenu mainMenu, Player player, Player player2, Song song, JFrame frame) throws IOException, UnsupportedAudioFileException, LineUnavailableException {
@@ -112,6 +113,10 @@ public class Tab extends JPanel {
     }
 
     //Getters
+
+    public long getSongDuration() {
+        return songDuration;
+    }
 
     public int getYpos() {
         return this.ypos;
@@ -247,7 +252,24 @@ public class Tab extends JPanel {
                 player.resetNoteStreak();
                 player.resetMultiplier();
                 if (player.life == 0) {
-                    //System.exit(0);
+                    paused = false;
+                        exit = true;
+                        gameThread.setExit(true);
+                        pauseAudio();
+                        if (!multiplayer) {
+                            ng.setExit(true);
+                            //if(controllers != null)
+                                //controllers.quitSDLGamepad();
+                            running = false;
+                            switchToGameMenu(mainMenu);
+
+                        } else {
+                            running = false;
+                            ng2.setExit(true);
+                            //if(controllers != null)
+                                //controllers.quitSDLGamepad();
+                            switchToGameMenu(mainMenu);
+                            }
                 } else {
                     player.life -= 5;
                 }
@@ -471,6 +493,7 @@ public class Tab extends JPanel {
         AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
         clip = AudioSystem.getClip();
         clip.open(audioStream);
+        songDuration = clip.getMicrosecondLength() / 1000;
         clip.start();
     }
 
