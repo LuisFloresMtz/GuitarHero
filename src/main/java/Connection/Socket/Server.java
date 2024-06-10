@@ -64,14 +64,5 @@ public class Server {
                 e.printStackTrace();
             }
         }).start();
-
-        // Mantener la aplicación en ejecución
-        while (true) {
-            try {
-                Thread.sleep(1000);  // Mantener el servidor activo
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
     }
 }

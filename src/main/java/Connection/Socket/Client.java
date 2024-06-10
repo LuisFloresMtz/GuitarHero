@@ -4,28 +4,22 @@ import Components.Menu.GameMenu;
 import Components.TextField.TextField;
 import Utilities.Button;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.*;
-import java.util.Date;
-import java.net.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-
 public class Client extends JPanel {
-    int PUERTO_DEL_CLIENTE;
-    int PUERTO_DEL_SERVIDOR;
+    int PUERTO_DEL_CLIENTE = 5001; // Cambiar si es necesario
+    int PUERTO_DEL_SERVIDOR = 5000;
     TextField server;
     Button connect;
     String ip;
@@ -35,9 +29,7 @@ public class Client extends JPanel {
     JLabel imageLabel;
     GameMenu gameMenu;
 
-
     public Client(GameMenu gameMenu, JFrame frame, int WIDTH, int HEIGHT) {
-        PUERTO_DEL_CLIENTE = PUERTO_DEL_SERVIDOR = 5000;
         frame.setCursor(Cursor.getDefaultCursor());
         setBackground(new Color(43, 45, 48));
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -82,7 +74,8 @@ public class Client extends JPanel {
 
         connect.addActionListener(e -> {
             try {
-                handleConnection(frame);
+                ip = server.getText();
+                handleConnection();
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
@@ -106,65 +99,44 @@ public class Client extends JPanel {
 
     public void handleServer(JFrame frame) {
         try {
-            JOptionPane.showMessageDialog(null, "Esperando al cliente...\n Tu ip es: " + java.net.InetAddress.getLocalHost().getHostAddress());
-            Server server = new Server(frame, gameMenu);
+            JOptionPane.showMessageDialog(null, "Esperando al cliente...\n Tu ip es: " + InetAddress.getLocalHost().getHostAddress());
+            new Server(frame, gameMenu);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    private void handleConnection() throws Exception {
+        dgSocket = new DatagramSocket(PUERTO_DEL_CLIENTE);
+        destination = InetAddress.getByName(ip);
 
-    private void handleConnection(JFrame frame) throws Exception {
-        new Thread(() -> {
-            String saludo = new String("hola" + "\0");
-            byte msg[] = saludo.getBytes();
-            try {
-                dgSocket = new DatagramSocket(
-                        PUERTO_DEL_CLIENTE,
-                        InetAddress.getByName(ip));
-            } catch (Exception e) {
-                System.out.println(e.getMessage());;
+        System.out.println("Cliente UDP activo, enviando mensajes al servidor...");
+
+        Timer timer = new Timer();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    // Crear y enviar el mensaje
+                    String saludo = "hola" + "\0";
+                    byte[] msg = saludo.getBytes();
+                    DatagramPacket datagram = new DatagramPacket(msg, msg.length, destination, PUERTO_DEL_SERVIDOR);
+                    dgSocket.send(datagram);
+                    System.out.println("Dato enviado");
+
+                    // Recibir la respuesta del servidor
+                    byte[] msgR = new byte[1024];
+                    datagram = new DatagramPacket(msgR, msgR.length);
+                    dgSocket.receive(datagram);
+                    String received = new String(datagram.getData()).split("\0")[0];
+                    System.out.println("DATOS DEL DATAGRAMA: " + received);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-            try {
-                destination = InetAddress.getByName(
-                        ip);
-            } catch (UnknownHostException uhe) {
-                System.err.println("Host no encontrado : " + uhe);
-                System.exit(-1);
-            }
-            byte msgR[] = new byte[1024];
-            try{
-            datagram = new DatagramPacket(msg, msg.length,
-                    destination,
-                    PUERTO_DEL_SERVIDOR);
-            dgSocket.send(datagram);
-            System.out.println("Dato enviado");
-            datagram = new DatagramPacket(msgR, msgR.length);
-            dgSocket.receive(datagram);
-            String received = new String(datagram.getData());
-            received = received.split("\0")[0];
-            System.out.println("DATOS DEL DATAGRAMA: "
-                    + received);
-            }catch (Exception e){e.printStackTrace();}
-            dgSocket.close();
-            try {
+        };
 
-                Thread.sleep(500);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-
-
+        // Programar la tarea para que se ejecute cada 500 ms
+        timer.scheduleAtFixedRate(task, 0, 500);
     }
 }
-
-
-
-
-
-
-
-
-
