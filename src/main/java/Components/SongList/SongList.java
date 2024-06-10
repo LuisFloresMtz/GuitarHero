@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import static java.awt.event.KeyEvent.VK_ENTER;
 
 public class SongList extends JPanel {
-    private String selectedSong;
+    private Song selectedSong;
     private final Menu3D menu;
     private final Panel panel = new Panel();
     ImageIcon albumCover;
@@ -130,7 +130,7 @@ public class SongList extends JPanel {
         }
     }
 
-    public String getSelectedSong() {
+    public Song getSelectedSong() {
         return selectedSong;
     }
 

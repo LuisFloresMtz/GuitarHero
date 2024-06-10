@@ -1,24 +1,26 @@
 package Connection.Socket;
 
 import Components.Menu.GameMenu;
-import Components.TextField.TextField;
-import Utilities.Button;
+import Components.Scenes.OnePlayerScene;
+import Utilities.Song;
 
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class Client extends JPanel {
-    int PUERTO_DEL_CLIENTE = 5001; // Cambiar si es necesario
+    int PUERTO_DEL_CLIENTE = 5001;
     int PUERTO_DEL_SERVIDOR = 5000;
     TextField server;
     Button connect;
@@ -26,16 +28,18 @@ public class Client extends JPanel {
     DatagramSocket dgSocket;
     DatagramPacket datagram;
     InetAddress destination = null;
-    JLabel imageLabel;
     GameMenu gameMenu;
+    JFrame frame;
+    private volatile boolean gameRunning = true;
 
     public Client(GameMenu gameMenu, JFrame frame, int WIDTH, int HEIGHT) {
+        this.frame = frame;
+        this.gameMenu = gameMenu;
         frame.setCursor(Cursor.getDefaultCursor());
         setBackground(new Color(43, 45, 48));
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setLayout(null);
         ip = "";
-        this.gameMenu = gameMenu;
 
         JLabel title = new JLabel("Ip del servidor:");
         title.setBounds(WIDTH / 2 - 50, (HEIGHT / 2) - 100, 200, 50);
@@ -75,7 +79,7 @@ public class Client extends JPanel {
         connect.addActionListener(e -> {
             try {
                 ip = server.getText();
-                handleConnection();
+                handleConnection(frame);
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
@@ -106,37 +110,64 @@ public class Client extends JPanel {
         }
     }
 
-    private void handleConnection() throws Exception {
+    private void handleConnection(JFrame frame) throws Exception {
         dgSocket = new DatagramSocket(PUERTO_DEL_CLIENTE);
         destination = InetAddress.getByName(ip);
 
-        System.out.println("Cliente UDP activo, enviando mensajes al servidor...");
+        System.out.println("Cliente UDP activo");
 
-        Timer timer = new Timer();
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
-                try {
-                    // Crear y enviar el mensaje
-                    String saludo = "hola" + "\0";
-                    byte[] msg = saludo.getBytes();
-                    DatagramPacket datagram = new DatagramPacket(msg, msg.length, destination, PUERTO_DEL_SERVIDOR);
-                    dgSocket.send(datagram);
-                    System.out.println("Dato enviado");
+        String request = "REQUEST_SONG_LIST" + "\0";
+        byte[] msg = request.getBytes();
+        datagram = new DatagramPacket(msg, msg.length, destination, PUERTO_DEL_SERVIDOR);
+        dgSocket.send(datagram);
 
-                    // Recibir la respuesta del servidor
-                    byte[] msgR = new byte[1024];
-                    datagram = new DatagramPacket(msgR, msgR.length);
-                    dgSocket.receive(datagram);
-                    String received = new String(datagram.getData()).split("\0")[0];
-                    System.out.println("DATOS DEL DATAGRAMA: " + received);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        byte[] buffer = new byte[8192];
+        datagram = new DatagramPacket(buffer, buffer.length);
+        dgSocket.receive(datagram);
+        ByteArrayInputStream bis = new ByteArrayInputStream(datagram.getData());
+        ObjectInputStream ois = new ObjectInputStream(bis);
+        Song song = (Song) ois.readObject();
+
+        SwingUtilities.invokeLater(() -> {
+            frame.getContentPane().removeAll();
+            OnePlayerScene onePlayerScene = null;
+            try {
+                onePlayerScene = new OnePlayerScene(gameMenu, frame, song);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } catch (UnsupportedAudioFileException e) {
+                throw new RuntimeException(e);
+            } catch (LineUnavailableException e) {
+                throw new RuntimeException(e);
             }
-        };
+            frame.add(onePlayerScene);
+            frame.revalidate();
+            frame.repaint();
 
-        // Programar la tarea para que se ejecute cada 500 ms
-        timer.scheduleAtFixedRate(task, 0, 500);
+            new Thread(() -> {
+                while (gameRunning) {
+                    try {
+                        // Enviar el estado del juego al servidor
+                        String estado = "CONTINUA" + "\0"; // Placeholder, reemplazar con lógica real
+                        byte[] estadoMsg = estado.getBytes();
+                        DatagramPacket estadoPaquete = new DatagramPacket(estadoMsg, estadoMsg.length, destination, PUERTO_DEL_SERVIDOR);
+                        dgSocket.send(estadoPaquete);
+
+                        // Recibir el estado del juego del servidor
+                        byte[] estadoBuffer = new byte[1024];
+                        DatagramPacket estadoRecibido = new DatagramPacket(estadoBuffer, estadoBuffer.length);
+                        dgSocket.receive(estadoRecibido);
+                        String estadoServidor = new String(estadoRecibido.getData()).split("\0")[0];
+                        System.out.println("Estado del servidor: " + estadoServidor);
+
+                        // Aquí puedes añadir la lógica para manejar el estado del juego según la respuesta del servidor
+
+                        Thread.sleep(500); // Esperar 500 ms antes de enviar/recibir nuevamente
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+        });
     }
 }
